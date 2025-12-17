@@ -1,0 +1,53 @@
+.minasona-icon {
+  display: inline-block;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.minasona-icon-container {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+.twitch-minasona-popover {
+  position: fixed;
+  min-width: 125px;
+  background-color: #18181b; /* Matches Twitch Dark Mode */
+  border: 1px solid #303032;
+  border-radius: 6px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+  z-index: 99999;
+  padding: 8px;
+
+  /* Flexbox to center the image inside the 250x250 box */
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  justify-content: center;
+  align-items: center;
+
+  /* Start hidden */
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.1s ease-in-out;
+  pointer-events: none; /* Prevents interaction when hidden */
+}
+
+.twitch-minasona-popover.active {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.twitch-minasona-popover img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* Keeps aspect ratio */
+}
+
+.minasona-name {
+  text-align: center;
+  font-weight: bold;
+  font-size: large;
+}
