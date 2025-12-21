@@ -93,6 +93,7 @@ function startSupervisor() {
     // get native and 7tv chat containers
     const nativeChatContainer = document.querySelector<HTMLElement>(".chat-scrollable-area__message-container");
     const sevenTvChatContainer = document.querySelector<HTMLElement>(".seventv-chat-list");
+    const vodChatContainer = document.querySelector<HTMLElement>("ul.InjectLayout-sc-1i43xsx-0"); // todo: test if this is really always the classname
 
     // seven tv has priority
     if (sevenTvChatContainer) {
@@ -105,6 +106,13 @@ function startSupervisor() {
     if (nativeChatContainer) {
       if (currentChatContainer !== nativeChatContainer) {
         mountObserver(nativeChatContainer);
+      }
+      return;
+    }
+
+    if (vodChatContainer) {
+      if (currentChatContainer !== vodChatContainer) {
+        mountObserver(vodChatContainer);
       }
       return;
     }
@@ -167,9 +175,9 @@ function disconnectObserver() {
 function processNode(node: Node) {
   if (!(node instanceof HTMLElement)) return;
 
-  // select any elements where the class contains the word "username"
+  // select any elements where the class contains the word "username" or "author"
   // this is most likely the element the username is in
-  const usernameElements = node.querySelectorAll<HTMLElement>('[class*="username"]');
+  const usernameElements = node.querySelectorAll<HTMLElement>('[class*="username"], [class*="author"]');
   // select the last element selected to get the "deepest" element
   // on native this is important to select only the name and not the element containing badges + name
   const innerUsernameEl = usernameElements[usernameElements.length - 1] ?? null;
@@ -177,7 +185,7 @@ function processNode(node: Node) {
   // no username element found
   if (!innerUsernameEl) return;
   // minasona-icon already appended
-  if (innerUsernameEl.querySelector<HTMLElement>(".minasona-icon")) return;
+  if (node.querySelector<HTMLElement>(".minasona-icon")) return;
 
   const username = innerUsernameEl.innerText.toLowerCase();
   // username not in existing minasonas
