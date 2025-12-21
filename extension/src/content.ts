@@ -209,9 +209,16 @@ function processNode(node: Node) {
   iconContainer.title = "Minasona";
   iconContainer.append(icon);
 
-  if (innerUsernameEl) {
+  const badgeSlot = node.querySelector<HTMLElement>('.chat-line__message--badges');
+
+  if (!badgeSlot && innerUsernameEl) {
     // just prepend iconContainer to name
     innerUsernameEl.prepend(iconContainer);
+  }
+
+  else if (badgeSlot) {
+    // insert after badge slot
+    badgeSlot.append(iconContainer);
   }
 }
 
