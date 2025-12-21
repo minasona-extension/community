@@ -209,14 +209,14 @@ function processNode(node: Node) {
   iconContainer.title = "Minasona";
   iconContainer.append(icon);
 
-  const badgeSlot = node.querySelector<HTMLElement>('.chat-line__message--badges');
+  // get badge slot to place icon there if present
+  // this is needed to preserve usernames containing color gradients and also the correct display of the pronouns extension
+  const badgeSlot = node.querySelector<HTMLElement>(".chat-line__message--badges, .seventv-chat-user-badge-list");
 
   if (!badgeSlot && innerUsernameEl) {
     // just prepend iconContainer to name
     innerUsernameEl.prepend(iconContainer);
-  }
-
-  else if (badgeSlot) {
+  } else if (badgeSlot) {
     // insert after badge slot
     badgeSlot.append(iconContainer);
   }

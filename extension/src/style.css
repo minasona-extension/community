@@ -8,7 +8,8 @@
   display: inline-flex;
   align-items: center;
   vertical-align: middle;
-  margin-right: 4px;
+  margin-right: 2px;
+  margin-left: 2px;
 }
 
 .twitch-minasona-popover {
