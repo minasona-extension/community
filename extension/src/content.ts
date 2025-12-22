@@ -1,7 +1,6 @@
-import { MinasonaMap, MinasonaStorage } from "./types";
+import { MinasonaStorage } from "./types";
 import browser from "webextension-polyfill";
 
-const API_URL = "https://arcade.minawan.dog/public/minasonas";
 const ALLOWED_CHANNEL = "cerbervt";
 const DEFAULT_MINASONAS = [
   "https://firebasestorage.googleapis.com/v0/b/minasona-twitch-extension.firebasestorage.app/o/Minawan_Yellow_72x72.webp?alt=media&token=37f8341c-c407-48a3-a2d3-09b62c1f4fef",
@@ -12,7 +11,7 @@ const DEFAULT_MINASONAS = [
 ];
 
 // the mapping of twitch usernames to minasona names and image urls
-let minasonaMap: MinasonaMap = {};
+let minasonaMap: MinasonaStorage = {};
 
 // the currently observed chat container and its observer
 let currentChatContainer: HTMLElement | null = null;
@@ -39,11 +38,7 @@ async function fetchMinasonaMap() {
   const result: { minasonaMap?: MinasonaStorage } = await browser.storage.local.get(["minasonaMap"]);
 
   if (!result.minasonaMap) return;
-
-  for (const twitchName in result.minasonaMap) {
-    const minasonaName = result.minasonaMap[twitchName];
-    minasonaMap[twitchName] = { minasonaName: minasonaName, iconUrl: `${API_URL}/${minasonaName}.webp`, imageUrl: `${API_URL}/${minasonaName}.webp` };
-  }
+  minasonaMap = result.minasonaMap;
 }
 
 /**
@@ -195,21 +190,29 @@ function processNode(node: Node) {
     if (!settingShowForEveryone) return;
     // add uncustomized minasona
     const rnd = Math.floor(Math.random() * DEFAULT_MINASONAS.length);
-    minasonaMap[username] = { minasonaName: "", iconUrl: DEFAULT_MINASONAS[rnd], imageUrl: "" };
+    minasonaMap[username] = { iconUrl: DEFAULT_MINASONAS[rnd], fallbackIconUrl: "", imageUrl: "", fallbackImageUrl: "" };
   }
 
   // create icon
-  const icon = document.createElement("img");
-  icon.src = minasonaMap[username].iconUrl;
-  icon.classList.add("minasona-icon");
-  icon.style.height = `${settingIconSize || "32"}px`;
+  const source = document.createElement("source");
+  source.srcset = minasonaMap[username].iconUrl;
+  source.type = "image/avif";
+  const img = document.createElement("img");
+  img.src = minasonaMap[username].fallbackIconUrl;
+  img.loading = "lazy";
+  img.classList.add("minasona-icon");
+  img.style.height = `${settingIconSize || "32"}px`;
+
+  const icon = document.createElement("picture");
+  icon.appendChild(source);
+  icon.appendChild(img);
   // add popover on click if its not a default minasona
   if (minasonaMap[username].imageUrl) {
     icon.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
 
-      showMinasonaPopover(e.target as HTMLElement, minasonaMap[username].minasonaName, minasonaMap[username].imageUrl);
+      showMinasonaPopover(e.target as HTMLElement, minasonaMap[username].imageUrl, minasonaMap[username].fallbackImageUrl);
     });
   }
 
@@ -246,8 +249,15 @@ function getOrCreatePopover(): HTMLElement {
     title.classList.add("minasona-name");
     popoverInstance.appendChild(title);
 
+    const source = document.createElement("source");
+    source.type = "image/avif";
     const img = document.createElement("img");
-    popoverInstance.appendChild(img);
+    img.loading = "lazy";
+
+    const picture = document.createElement("picture");
+    picture.appendChild(source);
+    picture.appendChild(img);
+    popoverInstance.appendChild(picture);
 
     document.body.append(popoverInstance);
 
@@ -267,12 +277,15 @@ function getOrCreatePopover(): HTMLElement {
  * @param minasonaName The name of the minasona to display.
  * @param imageUrl The image URL of the minasona to display.
  */
-function showMinasonaPopover(minasonaIcon: HTMLElement, minasonaName: string, imageUrl: string) {
+function showMinasonaPopover(minasonaIcon: HTMLElement, imageUrl: string, fallbackImageUrl: string) {
   const popover = getOrCreatePopover();
   const title = popover.querySelector<HTMLDivElement>(".minasona-name");
-  title.innerText = minasonaName;
+  title.innerText = "Title";
+
+  const source = popover.querySelector<HTMLSourceElement>("source");
+  source.srcset = imageUrl;
   const img = popover.querySelector<HTMLImageElement>("img");
-  img.src = imageUrl;
+  img.src = fallbackImageUrl;
 
   // get popover dimensions
   const popoverRect = popover.getBoundingClientRect();
