@@ -2,16 +2,10 @@ import { MinasonaStorage } from "./types";
 import browser from "webextension-polyfill";
 
 const ALLOWED_CHANNEL = "cerbervt";
-const DEFAULT_MINASONAS = [
-  "https://firebasestorage.googleapis.com/v0/b/minasona-twitch-extension.firebasestorage.app/o/Minawan_Yellow_72x72.webp?alt=media&token=37f8341c-c407-48a3-a2d3-09b62c1f4fef",
-  "https://firebasestorage.googleapis.com/v0/b/minasona-twitch-extension.firebasestorage.app/o/Minawan_Red_72x72.webp?alt=media&token=75aaa4ac-7f6b-4a39-9ba5-2a00ae6036f2",
-  "https://firebasestorage.googleapis.com/v0/b/minasona-twitch-extension.firebasestorage.app/o/Minawan_Purple_72x72.webp?alt=media&token=5c83366e-213c-4712-8ee8-cbd32a5b67f8",
-  "https://firebasestorage.googleapis.com/v0/b/minasona-twitch-extension.firebasestorage.app/o/Minawan_Green_72x72.webp?alt=media&token=43412b57-7e28-4008-bda9-52449402851f",
-  "https://firebasestorage.googleapis.com/v0/b/minasona-twitch-extension.firebasestorage.app/o/Minawan_Blue_72x72.webp?alt=media&token=af86f8cf-600f-4cab-832c-48fbf19b3f48",
-];
 
 // the mapping of twitch usernames to minasona names and image urls
 let minasonaMap: MinasonaStorage = {};
+let defaultMinasonaMap: string[] = [];
 
 // the currently observed chat container and its observer
 let currentChatContainer: HTMLElement | null = null;
@@ -35,10 +29,11 @@ startSupervisor();
  * todo: get regularly not just once
  */
 async function fetchMinasonaMap() {
-  const result: { minasonaMap?: MinasonaStorage } = await browser.storage.local.get(["minasonaMap"]);
+  const result: { minasonaMap?: MinasonaStorage; standardMinasonaUrls?: string[] } = await browser.storage.local.get(["minasonaMap", "standardMinasonaUrls"]);
 
-  if (!result.minasonaMap) return;
-  minasonaMap = result.minasonaMap;
+  if (!result) return;
+  minasonaMap = result.minasonaMap || {};
+  defaultMinasonaMap = result.standardMinasonaUrls || [];
 }
 
 /**
@@ -128,7 +123,7 @@ function mountObserver(container: HTMLElement) {
 
   currentChatContainer = container;
 
-  // if setting does not allow other channels -> check if channel is in allowed list
+  // if setting does not allow other channels -> check if channel is allowed
   if (!settingShowInOtherChats) {
     // check if the current twitch channel is supported
     const path = window.location.pathname.toLowerCase();
@@ -189,8 +184,13 @@ function processNode(node: Node) {
   if (!minasonaMap[username]) {
     if (!settingShowForEveryone) return;
     // add uncustomized minasona
-    const rnd = Math.floor(Math.random() * DEFAULT_MINASONAS.length);
-    minasonaMap[username] = { iconUrl: DEFAULT_MINASONAS[rnd], fallbackIconUrl: "", imageUrl: "", fallbackImageUrl: "" };
+    const rnd = Math.floor((Math.random() * Object.keys(defaultMinasonaMap).length) / 2) * 2;
+    minasonaMap[username] = {
+      iconUrl: defaultMinasonaMap[rnd],
+      fallbackIconUrl: defaultMinasonaMap[rnd + 1],
+      imageUrl: "",
+      fallbackImageUrl: "",
+    };
   }
 
   // create icon

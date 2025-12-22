@@ -5,7 +5,11 @@
   "version": "1.2",
   "permissions": ["storage", "alarms"],
   "action": { "default_popup": "popup.html", "default_title": "Minasona Twitch Icons Settings" },
-  "host_permissions": ["https://*.twitch.tv/*"],
+  "host_permissions": [
+    "https://*.twitch.tv/*",
+    "https://minawan.me/",
+    "https://storage.googleapis.com/minawan-pics.firebasestorage.app/minawan%2Fgallery.json"
+  ],
   "content_scripts": [
     {
       "matches": ["https://*.twitch.tv/*"],
