@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Minasona Twitch Icons",
   "description": "See cute Minawan not only in the stream but in the chat as well! Displays Minasonas as a badge right next to a username in the chat.",
-  "version": "1.2",
+  "version": "1.3",
   "permissions": ["storage", "alarms"],
   "action": { "default_popup": "popup.html", "default_title": "Minasona Twitch Icons Settings" },
   "host_permissions": [
