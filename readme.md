@@ -11,14 +11,14 @@ Settings:
 
 ## Out Now
 
-### Chrome v1.1
+### Chrome v1.3
 https://chromewebstore.google.com/detail/minasona-twitch-icons/paoappdblefbmihfcjbmcebhdgabfkib
 
-### Edge v1.0
+### Edge v1.3
 https://microsoftedge.microsoft.com/addons/detail/minasona-twitch-icons/annkpdgajokhpgdncdcfjmadjpafbecp
 
-### Opera v1.1
-Submitted Dec. 17 -> The extension from the chrome store should work as well
+### Opera v1.3
+[Download from chrome store](https://chromewebstore.google.com/detail/minasona-twitch-icons/paoappdblefbmihfcjbmcebhdgabfkib)
 
 ### Firefox v1.3
 https://addons.mozilla.org/de/firefox/addon/minasona-twitch-icons/
