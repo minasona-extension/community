@@ -1,5 +1,7 @@
 import browser from "webextension-polyfill";
 
+window.browser = browser;
+
 document.addEventListener("DOMContentLoaded", async () => {
   // init states
   const showInOtherChatsCheckbox = document.getElementById("showInOtherChats");

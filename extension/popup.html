@@ -106,6 +106,37 @@
         font-weight: 700;
         flex: 1;
       }
+
+      .minawan {
+        position: absolute;
+        cursor: pointer;
+        z-index: 1;
+      }
+
+      .minawan-img {
+        transform-origin: bottom;
+        animation: breathe 1s steps(2) infinite;
+        animation-delay: var(--delay, 0s);
+        transition: transform 0.3 ease;
+      }
+
+      @keyframes breathe {
+        0%,
+        100% {
+          transform: scaleY(1);
+        }
+        50% {
+          transform: scaleY(1.05);
+        }
+      }
+
+      .flipped {
+        transform: scaleX(-1) !important;
+      }
+
+      .paused {
+        animation-play-state: paused !important;
+      }
     </style>
   </head>
   <body>
@@ -150,6 +181,12 @@
       </div>
     </div>
 
+    <div id="hellpingwan" class="minawan"><img class="minawan-img" style="--delay: 0.33s" /></div>
+    <div id="hoopywan" class="minawan"><img class="minawan-img" /></div>
+    <div id="hybertwan" class="minawan"><img class="minawan-img" style="--delay: 0.66s" /></div>
+    <img id="petting-effect" style="display: none; position: absolute; pointer-events: none" />
+
     <script src="popup.js"></script>
+    <script src="popupMinawan.js"></script>
   </body>
 </html>
