@@ -1,3 +1,3 @@
 export interface MinasonaStorage {
-  [username: string]: { iconUrl: string; fallbackIconUrl: string; imageUrl: string; fallbackImageUrl: string };
+  [username: string]: { [communityName: string]: { iconUrl: string; fallbackIconUrl: string; imageUrl: string; fallbackImageUrl: string } };
 }

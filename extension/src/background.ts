@@ -17,30 +17,34 @@ const DEFAULT_MINASONAS = [
 // fetches the minasona list from the server and stores it into the local browser storage
 async function updateMinasonaMap() {
   try {
-    const response = await fetch(`https://minawan.me/gallery.json`, {
+    const response = await fetch(`https://storage.googleapis.com/minawan-pics.firebasestorage.app/api.json`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
     });
-    const data: { twitchUsername?: string; minasonaAvif64: string; minasonaPng64: string; minasonaAvif256: string; minasonaPng256: string }[] =
-      await response.json();
+    const data: Record<string, { twitchUsername?: string; avif64?: string; png64?: string; avif256?: string; png256?: string }[]> = await response.json();
 
     const reducedData: MinasonaStorage = {};
-    data.forEach((d) => {
-      if (!d.twitchUsername) return;
-      reducedData[d.twitchUsername] = {
-        iconUrl: encodeURI(d.minasonaAvif64),
-        fallbackIconUrl: encodeURI(d.minasonaPng64),
-        imageUrl: encodeURI(d.minasonaAvif256),
-        fallbackImageUrl: encodeURI(d.minasonaPng256),
-      };
+    Object.entries(data).forEach(([communityName, members]) => {
+      members.forEach((m) => {
+        if (!m.twitchUsername) return;
+        if (!reducedData[m.twitchUsername]) {
+          reducedData[m.twitchUsername] = {};
+        }
+        reducedData[m.twitchUsername][communityName] = {
+          iconUrl: encodeURI(m.avif64),
+          fallbackIconUrl: encodeURI(m.png64),
+          imageUrl: encodeURI(m.avif256),
+          fallbackImageUrl: encodeURI(m.png256),
+        };
+      });
     });
 
     browser.storage.local.set({ minasonaMap: reducedData });
-    console.log("Minasona map updated");
+    console.log(`${new Date().toLocaleTimeString()} Minasona map updated.`);
   } catch (error) {
-    console.error("Failed to fetch minasonas: ", error);
+    console.error(`${new Date().toLocaleTimeString()} Failed to fetch minasonas: `, error);
   }
 }
 
