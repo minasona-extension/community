@@ -230,6 +230,12 @@ function processNode(node: Node, channelName: string) {
   }
 }
 
+/**
+ * Creates a palsona (priority) list depending on the user settings.
+ * @param username The target user.
+ * @param channelName The currently watched channel name.
+ * @returns The palsona list to display in chat for this user.
+ */
 function createPalsonaEntryList(username: string, channelName: string): PalsonaEntry[] {
   console.log(`Creating palsona list for ${username}`);
   let palsonas: PalsonaEntry[] = [];
@@ -261,6 +267,11 @@ function createPalsonaEntryList(username: string, channelName: string): PalsonaE
   return palsonas;
 }
 
+/**
+ * Creates a palsona icon for the Twitch chat user and returns the element.
+ * @param ps The palsona entry to create the icon for.
+ * @returns The icon element.
+ */
 function createPalsonaIcon(ps: PalsonaEntry): HTMLPictureElement {
   const source = document.createElement("source");
   source.srcset = ps.iconUrl;
@@ -289,7 +300,7 @@ function createPalsonaIcon(ps: PalsonaEntry): HTMLPictureElement {
 }
 
 /**
- * determine which palsona to use for this user and channel
+ * Determine which palsona to use for this user and channel:
  * 1. Minasona (main channel) image
  * 2. currently watched channel -sona
  * after that all other palsonas present for this user
@@ -308,7 +319,7 @@ function getPalsonaPriorityList(userElement: { [communityName: string]: PalsonaE
     palsonaPrioList.push(userElement[MAIN_CHANNEL]);
   }
 
-  if (userElement[currentChannelName]) {
+  if (MAIN_CHANNEL != currentChannelName && userElement[currentChannelName]) {
     palsonaPrioList.push(userElement[currentChannelName]);
   }
 
@@ -415,6 +426,9 @@ async function preloadImage(src: string): Promise<void> {
   });
 }
 
+/**
+ * Swaps loader with picture element once the image is done loading.
+ */
 function swapPicture(
   sourceElement: HTMLSourceElement,
   avifSrc: string | null,
