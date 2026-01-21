@@ -71,7 +71,7 @@ node build.js chrome
 node build.js firefox
 ```
 
-3. You can find the files for the extension inside the `dist` folder.
+3. You can find the files for the extension inside `dist/`.
 
 ### Structure of the project
 
@@ -88,3 +88,5 @@ export const MAIN_CHANNEL = "cerbervt";
 
 2. Use `popup.html` to change the appearance of the settings page. You should alter the text and CSS to match the theme of your community.<br/>
 _Feel free to change the whole page if you feel like but keep in mind, if the IDs of the input elements are changed, you need to change them in `popup.js` as well._
+
+3. Decide how you want to handle the setting "Show Minasonas for everywan". Right now this works by inserting a random minasona from `assets/` for users without a Minasona / any other Palsona (depending on settings). The background script parses the images into data URLs which are then stored in the local browser storage. You can exchange the images of this folder if you want to use this feature, however you need to change the filenames in `background.ts` as well. **I made it so two consecutive files always belong together with _.avif_ being the standard and the other one as a fallback. Change this in the function _createPalsonaEntryList( )_ in `content.ts` if you don't want it.**

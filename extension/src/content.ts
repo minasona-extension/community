@@ -232,28 +232,27 @@ function processNode(node: Node, channelName: string) {
  * @returns The palsona list to display in chat for this user.
  */
 function createPalsonaEntryList(username: string, channelName: string): PalsonaEntry[] {
-  console.log(`Creating palsona list for ${username}`);
   let palsonas: PalsonaEntry[] = [];
 
   if (settingShowOtherPalsonas) {
+    // if other communities palsonas can be shown -> get the ordered list
     palsonas = getPalsonaPriorityList(minasonaMap[username], channelName);
   } else {
+    // otherwise just check for main channel palsona
     palsonas = minasonaMap[username][MAIN_CHANNEL] ? [minasonaMap[username][MAIN_CHANNEL]] : [];
   }
 
-  if (settingShowForEveryone) {
-    if (palsonas.length == 0) {
-      // user has no palsonas
-      const rnd = Math.floor((Math.random() * Object.keys(defaultMinasonaMap).length) / 2) * 2;
-      palsonas = [
-        {
-          iconUrl: defaultMinasonaMap[rnd],
-          fallbackIconUrl: defaultMinasonaMap[rnd + 1],
-          imageUrl: "",
-          fallbackImageUrl: "",
-        },
-      ];
-    }
+  if (settingShowForEveryone && palsonas.length == 0) {
+    // user has no palsonas but show for everyone is checked -> insert random default minasona
+    const rnd = Math.floor((Math.random() * Object.keys(defaultMinasonaMap).length) / 2) * 2;
+    palsonas = [
+      {
+        iconUrl: defaultMinasonaMap[rnd],
+        fallbackIconUrl: defaultMinasonaMap[rnd + 1],
+        imageUrl: "",
+        fallbackImageUrl: "",
+      },
+    ];
   }
   if (!settingShowAllPalsonas) {
     palsonas = palsonas[0] ? [palsonas[0]] : [];
