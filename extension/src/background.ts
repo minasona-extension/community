@@ -31,10 +31,11 @@ async function updateMinasonaMap() {
     Object.entries(data).forEach(([communityName, members]) => {
       members.forEach((m) => {
         if (!m.twitchUsername) return;
-        if (!reducedData[m.twitchUsername]) {
-          reducedData[m.twitchUsername] = {};
+        const lowerCaseUsername = m.twitchUsername.toLowerCase();
+        if (!reducedData[lowerCaseUsername]) {
+          reducedData[lowerCaseUsername] = {};
         }
-        reducedData[m.twitchUsername][communityName] = {
+        reducedData[lowerCaseUsername][communityName] = {
           iconUrl: encodeURI(m.avif64 || ""),
           fallbackIconUrl: encodeURI(m.png64 || ""),
           imageUrl: encodeURI(m.avif256 || ""),
