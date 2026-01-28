@@ -12,3 +12,8 @@ export interface PalsonaEntry {
 export interface MinasonaStorage {
   [username: string]: { [communityName: string]: PalsonaEntry };
 }
+
+export interface managerEntry {
+  dataId: string;
+  enabled: boolean;
+}

@@ -1,11 +1,7 @@
 import browser from "webextension-polyfill";
+import { managerEntry } from "./src/types";
 
 document.addEventListener("DOMContentLoaded", main);
-
-interface managerEntry {
-  dataId: string;
-  enabled: boolean;
-}
 
 async function main() {
   // init states
