@@ -2,6 +2,7 @@ import browser from "webextension-polyfill";
 import { managerEntry } from "./src/types";
 
 document.addEventListener("DOMContentLoaded", main);
+window.browser = browser;
 
 async function main() {
   // init states

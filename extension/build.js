@@ -18,7 +18,7 @@ if (existsSync(distDir)) {
 mkdirSync(distDir);
 
 // Run Vite builds
-["vite.content.config.ts", "vite.background.config.ts", "vite.popup.config.ts"].forEach((config) => {
+["vite.content.config.ts", "vite.background.config.ts", "vite.popup.config.ts", "vite.popupMinawan.config.ts"].forEach((config) => {
   console.log(`Building with config ${config}...`);
   execSync(`npx vite build --config ${config}`, { stdio: "inherit" });
 });

@@ -66,3 +66,11 @@
     transform: rotate(360deg);
   }
 }
+
+.petting-effect {
+  position: absolute;
+  pointer-events: none;
+  top: 0px;
+  z-index: 100000;
+  width: 90%;
+}
