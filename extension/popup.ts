@@ -2,29 +2,17 @@ import browser from "webextension-polyfill";
 import { managerEntry } from "./src/types";
 
 document.addEventListener("DOMContentLoaded", main);
-window.browser = browser;
 
 async function main() {
   // init states
-  const showInOtherChatsCheckbox = document.getElementById("showInOtherChats") as HTMLInputElement;
-
-  const result: { showInOtherChats?: boolean; palsonaManagerList?: managerEntry[]; palsonaLimit?: string; iconSize?: string } = await browser.storage.sync.get([
-    "showInOtherChats",
+  const result: { palsonaManagerList?: managerEntry[]; palsonaLimit?: string; iconSize?: string } = await browser.storage.sync.get([
     "palsonaManagerList",
     "palsonaLimit",
     "iconSize",
   ]);
-  // checkbox other chats
-  showInOtherChatsCheckbox.checked = result.showInOtherChats ?? true;
+  const communityResult: { communities?: string[] } = await browser.storage.local.get(["communities"]);
 
-  // save new state when user toggles the checkbox
-  showInOtherChatsCheckbox.addEventListener("change", () => {
-    const isChecked = showInOtherChatsCheckbox.checked;
-    // save to storage
-    browser.storage.sync.set({ showInOtherChats: isChecked });
-  });
-
-  handlePalsonaManager(result.palsonaManagerList);
+  handlePalsonaManager(result.palsonaManagerList, communityResult.communities);
   handleAmountSlider(parseInt(result.palsonaLimit));
   handleSizeSlider(parseInt(result.iconSize));
   updateTwitchPreview();
@@ -37,26 +25,77 @@ async function main() {
   }
 }
 
-function handlePalsonaManager(managerList: managerEntry[]) {
-  const initManagerList = managerList || [
-    { dataId: "main-channel", enabled: true },
-    { dataId: "current-channel", enabled: true },
-    { dataId: "other-channels", enabled: false },
-    { dataId: "default-minasona", enabled: false },
-  ];
+/**
+ * Check the managerList and remove any items where the dataId is not present in the communities array.
+ * Then append any community which is not in the managerList to the end and enable them.
+ * @param managerList
+ * @param communities
+ * @returns
+ */
+function createCurrentManagerList(managerList: managerEntry[], communities: string[]): managerEntry[] {
+  if (!managerList) {
+    return [
+      { dataId: "current-channel", enabled: true },
+      ...communities.map((community) => {
+        return { dataId: community, enabled: true };
+      }),
+    ];
+  }
+
+  // remove items that are no longer in communities
+  const cleanedManagerList = managerList.filter((entry) => entry.dataId === "current-channel" || communities.includes(entry.dataId));
+
+  // find communities that aren't in the managerlist
+  const existingCommunities = managerList.map((entry) => entry.dataId);
+  const newEntries: managerEntry[] = communities.filter((com) => !existingCommunities.includes(com)).map((com) => ({ dataId: com, enabled: true }));
+
+  return [...cleanedManagerList, ...newEntries];
+}
+
+function handlePalsonaManager(managerList: managerEntry[], communities: string[]) {
+  const cleanedManagerList = createCurrentManagerList(managerList, communities || []);
+
   // init state
   const managerElement = document.getElementById("palsona-manager") as HTMLDivElement;
-  const channelItems = managerElement.querySelectorAll<HTMLDivElement>(".draggable-item");
-  managerElement.childNodes.forEach((child) => {
-    child.remove();
-  });
 
-  for (const entry of initManagerList) {
-    const currentChannelItem = Array.from(channelItems).find((item) => {
-      return item.dataset.id === entry.dataId;
-    });
-    const checkbox = currentChannelItem.querySelector("input");
-    checkbox.checked = entry.enabled;
+  for (const entry of cleanedManagerList) {
+    // create channel item here
+    const currentChannelItem = document.createElement("div");
+    currentChannelItem.classList.add("draggable-item");
+    currentChannelItem.draggable = true;
+    currentChannelItem.dataset.id = entry.dataId;
+
+    const label = document.createElement("label");
+    label.classList.add("option-label");
+    label.title = "Palsona for the currently watched channel";
+    currentChannelItem.append(label);
+
+    const dragImg = document.createElement("img");
+    dragImg.style.height = "24px";
+    dragImg.style.cursor = "grab";
+    dragImg.style.fill = "white";
+    dragImg.draggable = false;
+    dragImg.src = "assets/drag-handle-svgrepo-com.svg";
+    label.append(dragImg);
+
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.checked = entry.enabled;
+    label.append(input);
+
+    const span = document.createElement("span");
+    span.innerText = getCommunityName(entry.dataId);
+    if (entry.dataId !== "current-channel") {
+      span.title = `${entry.dataId}'s community`;
+    }
+    label.append(span);
+
+    const palsonaImage = document.createElement("img");
+    palsonaImage.classList.add("minasona-icon");
+    palsonaImage.draggable = false;
+    palsonaImage.src = getIconSrc(entry.dataId);
+    span.prepend(palsonaImage);
+
     managerElement.append(currentChannelItem);
   }
 
@@ -110,8 +149,8 @@ function handleAmountSlider(palsonaLimit: number) {
   const labelText = document.getElementById("amountLabel") as HTMLSpanElement;
   const minasonaIcons = document.querySelectorAll<HTMLImageElement>(".minasona-preview-icon");
 
-  palsonaAmount.value = (palsonaLimit || 2).toString();
-  labelText.innerText = `${palsonaLimit || 2} Palsonas`;
+  palsonaAmount.value = (palsonaLimit || 3).toString();
+  labelText.innerText = `${palsonaLimit || 3} Palsonas`;
   for (let i = 0; i < minasonaIcons.length; i++) {
     minasonaIcons[i].style.display = i < palsonaLimit ? "inline-block" : "none";
   }
@@ -171,13 +210,34 @@ function updateTwitchPreview() {
 
 function getIconSrc(dataId: string): string {
   switch (dataId) {
-    case "main-channel":
-      return "assets/Cerby_64x64.png";
-    case "current-channel":
+    case "cerbervt":
+      return "assets/Minawan_Purple_64x64.png";
+    case "chrchie":
       return "assets/wormpal.png";
-    case "other-channels":
+    case "minikomew":
+      return "assets/minyan_cropped.png";
+    case "shoomimi":
+      return "assets/shoominyan_64x64.png";
+    case "current-channel":
       return "assets/Ditto.png";
-    case "default-minasona":
-      return "assets/Minawan_Purple.webp";
+    default:
+      return "";
+  }
+}
+
+function getCommunityName(dataId: string): string {
+  switch (dataId) {
+    case "cerbervt":
+      return "Minawan";
+    case "chrchie":
+      return "Wormpal";
+    case "minikomew":
+      return "Minyan";
+    case "shoomimi":
+      return "Shoominions";
+    case "current-channel":
+      return "Current Channel Palsona";
+    default:
+      return `${dataId}'s Channel Palsona`;
   }
 }

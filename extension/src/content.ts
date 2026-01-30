@@ -5,7 +5,6 @@ import browser from "webextension-polyfill";
 
 // the mapping of twitch usernames to minasona names and image urls
 let minasonaMap: MinasonaStorage = {};
-let defaultMinasonaMap: string[] = [];
 
 // the currently observed chat container and its observer
 let currentChatContainer: HTMLElement | null = null;
@@ -22,7 +21,7 @@ let settingPalsonaManagerList: managerEntry[] = [
   { dataId: "other-channels", enabled: false },
   { dataId: "default-minasona", enabled: false },
 ];
-let settingPalsonaLimit = "2";
+let settingPalsonaLimit = "3";
 let settingIconSize = "32";
 
 applySettings();
@@ -82,11 +81,10 @@ browser.storage.onChanged.addListener((_changes, namespace) => {
  * The mapping is set by the background script and updated every UPDATE_INTERVAL mins.
  */
 async function fetchMinasonaMap() {
-  const result: { minasonaMap?: MinasonaStorage; standardMinasonaUrls?: string[] } = await browser.storage.local.get(["minasonaMap", "standardMinasonaUrls"]);
+  const result: { minasonaMap?: MinasonaStorage } = await browser.storage.local.get(["minasonaMap"]);
 
   if (!result) return;
   minasonaMap = result.minasonaMap || {};
-  defaultMinasonaMap = result.standardMinasonaUrls || [];
   currentPalsonaList = {};
   console.log(`${new Date().toLocaleTimeString()}: Updated minasona map and reset current lookup list.`);
 }
@@ -266,18 +264,6 @@ function getPalsonaPriorityList(userElement: { [communityName: string]: PalsonaE
     }
 
     const prioString = prio.dataId === "main-channel" ? MAIN_CHANNEL : prio.dataId === "current-channel" ? currentChannelName : "";
-    if (prioString === "" && palsonaPrioList.length == 0) {
-      // add default minasona
-      const rnd = Math.floor((Math.random() * Object.keys(defaultMinasonaMap).length) / 2) * 2;
-      palsonaPrioList.push({
-        iconUrl: defaultMinasonaMap[rnd],
-        fallbackIconUrl: defaultMinasonaMap[rnd + 1],
-        imageUrl: "",
-        fallbackImageUrl: "",
-      });
-      index++;
-      continue;
-    }
     if (userElement[prioString]) {
       if (palsonaPrioList.includes(userElement[prioString])) continue;
       palsonaPrioList.push(userElement[prioString]);

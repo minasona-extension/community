@@ -2,19 +2,6 @@ import browser from "webextension-polyfill";
 import { MinasonaStorage } from "./types";
 import { UPDATE_INTERVAL } from "./config";
 
-const DEFAULT_MINASONAS = [
-  "Minawan_Blue.avif",
-  "Minawan_Blue.webp",
-  "Minawan_Green.avif",
-  "Minawan_Green.webp",
-  "Minawan_Purple.avif",
-  "Minawan_Purple.webp",
-  "Minawan_Red.avif",
-  "Minawan_Red.webp",
-  "Minawan_Yellow.avif",
-  "Minawan_Yellow.webp",
-];
-
 /**
  * Fetches the Palsona list from the server and stores it into the local browser storage.
  */
@@ -27,6 +14,7 @@ async function updateMinasonaMap() {
       },
     });
     const data: Record<string, { twitchUsername?: string; avif64?: string; png64?: string; avif256?: string; png256?: string }[]> = await response.json();
+    const communities = Object.keys(data).filter((community) => data[community].length > 0);
 
     const reducedData: MinasonaStorage = {};
     Object.entries(data).forEach(([communityName, members]) => {
@@ -45,7 +33,7 @@ async function updateMinasonaMap() {
       });
     });
 
-    browser.storage.local.set({ minasonaMap: reducedData, lastUpdate: new Date().getTime() });
+    browser.storage.local.set({ minasonaMap: reducedData, lastUpdate: new Date().getTime(), communities: communities });
     console.log(`${new Date().toLocaleTimeString()} Minasona map updated.`);
   } catch (error) {
     console.error(`${new Date().toLocaleTimeString()} Failed to fetch minasonas: `, error);
@@ -56,15 +44,6 @@ async function updateMinasonaMap() {
 browser.runtime.onInstalled.addListener(async () => {
   updateMinasonaMap();
   setupAlarm();
-
-  // create data urls for standard minasonas
-  const data: string[] = [];
-
-  for (const asset of DEFAULT_MINASONAS) {
-    data.push(await getDataURL(asset));
-  }
-
-  browser.storage.local.set({ standardMinasonaUrls: data });
 });
 
 // Update data on browser startup and set up alarm
@@ -72,22 +51,6 @@ browser.runtime.onStartup.addListener(() => {
   updateMinasonaMap();
   setupAlarm();
 });
-
-async function getDataURL(asset: string): Promise<string> {
-  const url = browser.runtime.getURL(`assets/${asset}`);
-  const res = await fetch(url);
-  const blob = await res.blob();
-  const reader = new FileReader();
-  let result = "";
-  await new Promise<void>((resolve) => {
-    reader.onload = () => {
-      result = reader.result as string;
-      resolve();
-    };
-    reader.readAsDataURL(blob);
-  });
-  return result;
-}
 
 browser.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === "refreshMinasonas") {
