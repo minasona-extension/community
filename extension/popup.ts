@@ -218,10 +218,8 @@ function getIconSrc(dataId: string): string {
       return "assets/minyan_cropped.png";
     case "shoomimi":
       return "assets/shoominyan_64x64.png";
-    case "current-channel":
-      return "assets/Ditto.png";
     default:
-      return "";
+      return "assets/Ditto.png";
   }
 }
 
@@ -238,6 +236,6 @@ function getCommunityName(dataId: string): string {
     case "current-channel":
       return "Current Channel Palsona";
     default:
-      return `${dataId}'s Channel Palsona`;
+      return `${dataId.charAt(0).toUpperCase()}${dataId.slice(1)}'s Channel Palsona`;
   }
 }
