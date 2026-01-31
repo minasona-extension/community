@@ -1,5 +1,6 @@
 import browser from "webextension-polyfill";
 import { managerEntry } from "./src/types";
+import { getCommunityName, getIconSrc } from "./src/config";
 
 document.addEventListener("DOMContentLoaded", main);
 
@@ -205,37 +206,5 @@ function updateTwitchPreview() {
   for (let i = iconIndex; i < minasonaIcons.length; i++) {
     minasonaIcons[iconIndex].style.display = "none";
     minasonaIcons[i].src = "";
-  }
-}
-
-function getIconSrc(dataId: string): string {
-  switch (dataId) {
-    case "cerbervt":
-      return "assets/Minawan_Purple_64x64.png";
-    case "chrchie":
-      return "assets/wormpal.png";
-    case "minikomew":
-      return "assets/minyan_cropped.png";
-    case "shoomimi":
-      return "assets/shoominyan_64x64.png";
-    default:
-      return "assets/Ditto.png";
-  }
-}
-
-function getCommunityName(dataId: string): string {
-  switch (dataId) {
-    case "cerbervt":
-      return "Minawan";
-    case "chrchie":
-      return "Wormpal";
-    case "minikomew":
-      return "Minyan";
-    case "shoomimi":
-      return "Shoominions";
-    case "current-channel":
-      return "Current Channel Palsona";
-    default:
-      return `${dataId.charAt(0).toUpperCase()}${dataId.slice(1)}'s Channel Palsona`;
   }
 }

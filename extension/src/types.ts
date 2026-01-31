@@ -1,4 +1,5 @@
 export interface PalsonaEntry {
+  communityName: string;
   iconUrl: string;
   fallbackIconUrl: string;
   imageUrl: string;

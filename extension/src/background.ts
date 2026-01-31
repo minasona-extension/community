@@ -25,6 +25,7 @@ async function updateMinasonaMap() {
           reducedData[lowerCaseUsername] = {};
         }
         reducedData[lowerCaseUsername][communityName] = {
+          communityName: communityName,
           iconUrl: encodeURI(m.avif64 || ""),
           fallbackIconUrl: encodeURI(m.png64 || ""),
           imageUrl: encodeURI(m.avif256 || ""),

@@ -1,4 +1,4 @@
-import { MAIN_CHANNEL, UPDATE_INTERVAL } from "./config";
+import { getCommunityName, UPDATE_INTERVAL } from "./config";
 import { showMinasonaPopover } from "./minasona-popover";
 import { managerEntry, MinasonaStorage, PalsonaEntry } from "./types";
 import browser from "webextension-polyfill";
@@ -14,13 +14,7 @@ let currentObserver: MutationObserver | null = null;
 let currentPalsonaList: { [username: string]: PalsonaEntry[] } = {};
 
 // settings - initialize with defaults
-let settingShowInOtherChats = true;
-let settingPalsonaManagerList: managerEntry[] = [
-  { dataId: "main-channel", enabled: true },
-  { dataId: "current-channel", enabled: true },
-  { dataId: "other-channels", enabled: false },
-  { dataId: "default-minasona", enabled: false },
-];
+let settingPalsonaManagerList: managerEntry[] = [{ dataId: "current-channel", enabled: true }];
 let settingPalsonaLimit = "3";
 let settingIconSize = "32";
 
@@ -34,32 +28,25 @@ setInterval(fetchMinasonaMap, UPDATE_INTERVAL * 60 * 1000);
  * Fetches settings from the browsers storage and applies them to the local variables.
  */
 async function applySettings() {
-  const result: { showInOtherChats?: boolean; palsonaManagerList?: managerEntry[]; palsonaLimit?: string; iconSize?: string } = await browser.storage.sync.get([
-    "showInOtherChats",
+  const result: { palsonaManagerList?: managerEntry[]; palsonaLimit?: string; iconSize?: string } = await browser.storage.sync.get([
     "palsonaManagerList",
     "palsonaLimit",
     "iconSize",
   ]);
-
-  if (settingShowInOtherChats != result.showInOtherChats) {
-    settingShowInOtherChats = result.showInOtherChats ?? true;
-    // reload observer
-    if (currentChatContainer) {
-      mountObserver(currentChatContainer);
-    }
-  }
+  const communityResponse: { communities?: string[] } = await browser.storage.local.get(["communities"]);
+  const communities = communityResponse.communities || [];
 
   if (settingPalsonaManagerList != result.palsonaManagerList) {
     settingPalsonaManagerList = result.palsonaManagerList ?? [
-      { dataId: "main-channel", enabled: true },
       { dataId: "current-channel", enabled: true },
-      { dataId: "other-channels", enabled: false },
-      { dataId: "default-minasona", enabled: false },
+      ...communities.map((community) => {
+        return { dataId: community, enabled: true };
+      }),
     ];
   }
 
   if (settingPalsonaLimit != result.palsonaLimit) {
-    settingPalsonaLimit = result.palsonaLimit || "2";
+    settingPalsonaLimit = result.palsonaLimit || "3";
   }
 
   if (settingIconSize != result.iconSize) {
@@ -143,14 +130,6 @@ function mountObserver(container: HTMLElement) {
   // get current channel name from url
   const path = window.location.pathname.toLowerCase();
   const channelName = path.split("/").filter((seg) => seg.length > 0)[0];
-
-  // if setting does not allow other channels -> check if channel is allowed
-  if (!settingShowInOtherChats) {
-    // check if the current twitch channel is supported
-    if (channelName !== MAIN_CHANNEL) {
-      return;
-    }
-  }
 
   // process existing children
   Array.from(container.children).forEach((node) => processNode(node, channelName));
@@ -251,19 +230,8 @@ function getPalsonaPriorityList(userElement: { [communityName: string]: PalsonaE
 
   for (const prio of cleanedManagerPrioList) {
     if (index == limit) break;
-    // other channels -> add all entries that are not main channel or current channel
-    if (prio.dataId === "other-channels") {
-      for (const [communityName, entry] of Object.entries(userElement)) {
-        if (index == limit) break;
-        // filter main and current
-        if (communityName == MAIN_CHANNEL || communityName == currentChannelName) continue;
-        palsonaPrioList.push(entry);
-        index++;
-      }
-      continue;
-    }
 
-    const prioString = prio.dataId === "main-channel" ? MAIN_CHANNEL : prio.dataId === "current-channel" ? currentChannelName : "";
+    const prioString = prio.dataId === "current-channel" ? currentChannelName : prio.dataId;
     if (userElement[prioString]) {
       if (palsonaPrioList.includes(userElement[prioString])) continue;
       palsonaPrioList.push(userElement[prioString]);
@@ -291,6 +259,7 @@ function createPalsonaIcon(ps: PalsonaEntry): HTMLPictureElement {
   img.style.height = `${settingIconSize || "32"}px`;
 
   const icon = document.createElement("picture");
+  icon.title = `${getCommunityName(ps.communityName)} (${ps.communityName}'s community)`;
   icon.appendChild(source);
   icon.appendChild(img);
   // add popover on click if its not a default minasona
