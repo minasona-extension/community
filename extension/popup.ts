@@ -6,7 +6,8 @@ document.addEventListener("DOMContentLoaded", main);
 
 async function main() {
   // init states
-  const result: { palsonaManagerList?: managerEntry[]; palsonaLimit?: string; iconSize?: string } = await browser.storage.sync.get([
+  const result: { disabled?: boolean; palsonaManagerList?: managerEntry[]; palsonaLimit?: string; iconSize?: string } = await browser.storage.sync.get([
+    "disabled",
     "palsonaManagerList",
     "palsonaLimit",
     "iconSize",
@@ -24,6 +25,15 @@ async function main() {
   if (lastUpdateElement && lastUpdateResult && lastUpdateResult.lastUpdate) {
     lastUpdateElement.innerText = new Date(lastUpdateResult.lastUpdate).toLocaleString();
   }
+
+  if (result.disabled) {
+    disableSettingsPage();
+  }
+}
+
+function disableSettingsPage() {
+  const disableScreen = document.getElementById("disable-screen") as HTMLDivElement;
+  disableScreen.style.display = "flex";
 }
 
 /**

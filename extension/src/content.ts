@@ -3,6 +3,9 @@ import { showMinasonaPopover } from "./minasona-popover";
 import { managerEntry, MinasonaStorage, PalsonaEntry } from "./types";
 import browser from "webextension-polyfill";
 
+let thisExtensionDisabled = false;
+handleMinasonaExtension();
+
 // the mapping of twitch usernames to minasona names and image urls
 let minasonaMap: MinasonaStorage = {};
 
@@ -73,7 +76,30 @@ async function fetchMinasonaMap() {
   if (!result) return;
   minasonaMap = result.minasonaMap || {};
   currentPalsonaList = {};
-  console.log(`${new Date().toLocaleTimeString()}: Updated minasona map and reset current lookup list.`);
+  console.log(`${new Date().toLocaleTimeString()}: Updated palsona map and reset current lookup list.`);
+}
+
+async function handleMinasonaExtension() {
+  await browser.storage.sync.set({ disabled: false });
+  thisExtensionDisabled = false;
+
+  // listen for custom event from minasona extension
+  document.addEventListener("MINASONA_EXTENSION_ENABLED", () => {
+    console.warn("Disabling community palsona extension because minasona extension is enabled!");
+    disableThisExtension();
+  });
+}
+
+function isMinasonaExtensionEnabled(): boolean {
+  if (document.querySelector<HTMLElement>(".minasona-icon")) {
+    return true;
+  }
+  return false;
+}
+
+async function disableThisExtension() {
+  thisExtensionDisabled = true;
+  await browser.storage.sync.set({ disabled: true });
 }
 
 /**
@@ -83,6 +109,16 @@ async function fetchMinasonaMap() {
  */
 function startSupervisor() {
   setInterval(() => {
+    if (!thisExtensionDisabled) {
+      if (isMinasonaExtensionEnabled()) {
+        console.warn("Disabling community palsona extension because minasona icons were found in the chat!");
+        disableThisExtension();
+      }
+    }
+    if (thisExtensionDisabled) {
+      disconnectObserver();
+      return;
+    }
     // get native, 7tv and VOD chat containers
 
     // seven tv has priority
@@ -182,8 +218,8 @@ function getUsernameElement(node: HTMLElement): HTMLElement {
 function processNode(node: Node, channelName: string) {
   if (!(node instanceof HTMLElement)) return;
 
-  // minasona-icon already appended
-  if (node.querySelector<HTMLElement>(".minasona-icon")) return;
+  // palsona-icon already appended
+  if (node.querySelector<HTMLElement>(".palsona-icon")) return;
 
   // get username
   const usernameElement = getUsernameElement(node);
@@ -200,7 +236,7 @@ function processNode(node: Node, channelName: string) {
 
   // create icon container
   const iconContainer = document.createElement("div");
-  iconContainer.classList.add("minasona-icon-container");
+  iconContainer.classList.add("palsona-icon-container");
 
   for (const ps of currentPalsonaList[username]) {
     const icon = createPalsonaIcon(ps);
@@ -255,7 +291,7 @@ function createPalsonaIcon(ps: PalsonaEntry): HTMLPictureElement {
   const img = document.createElement("img");
   img.src = ps.fallbackIconUrl;
   img.loading = "lazy";
-  img.classList.add("minasona-icon");
+  img.classList.add("palsona-icon");
   img.style.height = `${settingIconSize || "32"}px`;
 
   const icon = document.createElement("picture");
