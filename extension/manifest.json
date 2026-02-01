@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "Palsona Twitch Icons",
-  "description": "See cute Minawan not only in the stream but in the chat as well! Displays Minasonas as a badge right next to a username in the chat.",
+  "name": "Palsona Twitch Badges",
+  "description": "See cute Palsonas not only on stream or in the Discord but in the Twitch chat as well!",
   "version": "1.0",
   "permissions": ["storage", "alarms"],
-  "action": { "default_popup": "popup.html", "default_title": "Minasona Twitch Icons Settings" },
+  "action": { "default_popup": "popup.html", "default_title": "Palsona Twitch Badges Settings" },
   "host_permissions": ["https://*.twitch.tv/*", "https://minawan.me/", "https://storage.googleapis.com/minawan-pics.firebasestorage.app/*"],
   "content_scripts": [
     {

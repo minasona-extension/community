@@ -1,4 +1,4 @@
-# Palsona Twitch Icons
+# Palsona Twitch Badges
 
 See cute Palsonas not only on stream or in the Discord but in the Twitch chat as well!
 
