@@ -5,7 +5,7 @@
   "version": "1.0",
   "permissions": ["storage", "alarms"],
   "action": { "default_popup": "popup.html", "default_title": "Palsona Twitch Badges Settings" },
-  "host_permissions": ["https://*.twitch.tv/*", "https://minawan.me/", "https://storage.googleapis.com/minawan-pics.firebasestorage.app/*"],
+  "host_permissions": ["https://*.twitch.tv/*", "https://storage.googleapis.com/minawan-pics.firebasestorage.app/*"],
   "content_scripts": [
     {
       "matches": ["https://*.twitch.tv/*"],
@@ -18,8 +18,9 @@
     "type": "module"
   },
   "icons": {
-    "48": "assets/Minawan_Purple_48x48.png",
-    "128": "assets/Minawan_Purple_128x128.png"
+    "48": "assets/logo_48x48.png",
+    "64": "assets/logo_64x64.png",
+    "128": "assets/logo_128x128.png"
   },
   "browser_specific_settings": {
     "gecko": {

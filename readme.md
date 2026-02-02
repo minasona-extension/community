@@ -10,7 +10,7 @@ Settings:
 - Limit Palsonas: Decide how many icons there should be for each user by limiting them.
 - Size: Use the slider to make the chat icons smaller or larger.
 
-## Out Now
+## Out Soon
 
 ### Chrome v-
 
