@@ -153,6 +153,18 @@ function startSupervisor() {
   }, 5000);
 }
 
+function getChannelNameFromTwitch(): string {
+  // determine channel name through dom
+  const channelInfoElement = document.querySelector<HTMLDivElement>(".channel-info-content");
+  const hostingChannelElements = channelInfoElement?.querySelectorAll<HTMLLinkElement>('a[href^="/"]'); // get only internal links starting with "/"
+
+  const channelLinks = Array.from(hostingChannelElements).filter((element) => {
+    return element.href.split("/").length === 4; // channel names are in the format "https://twitch.tv/channel" resulting in 4 elements when split
+  });
+
+  return channelLinks[0]?.href.split(".tv/")[1];
+}
+
 /**
  * Mounts a mutation observer on the given chat container to monitor new chat messages.
  * @param container The chat container element to observe.
@@ -165,7 +177,12 @@ function mountObserver(container: HTMLElement) {
 
   // get current channel name from url
   const path = window.location.pathname.toLowerCase();
-  const channelName = path.split("/").filter((seg) => seg.length > 0)[0];
+  let channelName = path.split("/").filter((seg) => seg.length > 0)[0];
+
+  // handle vods
+  if (channelName === "videos") {
+    channelName = getChannelNameFromTwitch();
+  }
 
   // process existing children
   Array.from(container.children).forEach((node) => processNode(node, channelName));
