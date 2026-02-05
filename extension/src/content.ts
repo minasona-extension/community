@@ -175,14 +175,23 @@ function mountObserver(container: HTMLElement) {
 
   currentChatContainer = container;
 
+  let channelName = "";
   // get current channel name from url
   const path = window.location.pathname.toLowerCase();
-  let channelName = path.split("/").filter((seg) => seg.length > 0)[0];
+  const pathItems = path.split("/").filter((seq) => seq.length > 0);
+  for (let i = 0; i < pathItems.length; i++) {
+    const item = pathItems[i];
+    if (item !== "moderator" && item !== "popout") {
+      channelName = item;
+      break;
+    }
+  }
 
   // handle vods
   if (channelName === "videos") {
     channelName = getChannelNameFromTwitch();
   }
+  if (channelName === "") return;
 
   // process existing children
   Array.from(container.children).forEach((node) => processNode(node, channelName));
