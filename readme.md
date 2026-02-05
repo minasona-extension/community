@@ -5,21 +5,33 @@ See cute Palsonas not only on stream or in the Discord but in the Twitch chat as
 This extension displays the Palsonas of a user as badges right next to their username in Twitch chat. It's a neat addon to the chat and helps people get to know everyone's Palsonas better.
 
 Settings:
-- Priority List: Rank the prioritiy of different communities and toggle them on or off.
+- Priority List: Rank the prioritiy of different Palsona categories and toggle them on or off.
   - Currently watched channel Palsonas: Displays the Palsona of the currently watched community.
 - Limit Palsonas: Decide how many icons there should be for each user by limiting them.
 - Size: Use the slider to make the chat icons smaller or larger.
 
+**Please choose between this extension and the Minasona Twitch Icons extension.**
+
+### Thank you
+Backend & Hosting - [Hoopy](https://jessecorbett.com/)
+
+Logo Art - [Anzeal](https://x.com/Anzeal14)
+
+Community & Project Strategy - Heroilde
+
 ## Out Soon
 
-### Chrome v-
+### Chrome v1.0
+https://chromewebstore.google.com/detail/eiceflbbckfcbmkeinpjkcibaenlmhff
 
-### Edge v-
+### Edge v1.0
+[Download from chrome store](https://chromewebstore.google.com/detail/eiceflbbckfcbmkeinpjkcibaenlmhff)
 
-### Opera v-
-[Download from chrome store]()
+### Opera v1.0
+[Download from chrome store](https://chromewebstore.google.com/detail/eiceflbbckfcbmkeinpjkcibaenlmhff)
 
-### Firefox v-
+### Firefox v1.0
+https://addons.mozilla.org/de/firefox/addon/palsona-twitch-badges/
 
 ## Changelog
 
