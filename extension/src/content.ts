@@ -321,7 +321,7 @@ function createPalsonaIcon(ps: PalsonaEntry): HTMLPictureElement {
   img.style.height = `${settingIconSize || "32"}px`;
 
   const icon = document.createElement("picture");
-  icon.title = `${getCommunityName(ps.communityName)} (${ps.communityName})`;
+  icon.title = `${getCommunityName(ps.communityName)} (${ps.communityName.charAt(0).toUpperCase()}${ps.communityName.slice(1)})`;
   icon.appendChild(source);
   icon.appendChild(img);
   // add popover on click if its not a default minasona

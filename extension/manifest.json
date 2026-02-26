@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Palsona Twitch Badges",
   "description": "See cute Palsonas not only on stream or in the Discord but in the Twitch chat as well!",
-  "version": "1.0.1",
+  "version": "1.4.1",
   "permissions": ["storage", "alarms"],
   "action": { "default_popup": "popup.html", "default_title": "Palsona Twitch Badges Settings" },
   "host_permissions": ["https://*.twitch.tv/*", "https://storage.googleapis.com/minawan-pics.firebasestorage.app/*"],
