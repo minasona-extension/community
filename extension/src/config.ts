@@ -12,7 +12,7 @@ export function getIconSrc(dataId: string): string {
     case "shoomimi":
       return "assets/shoominyan_64x64.png";
     default:
-      return "assets/Ditto.png";
+      return "assets/unknown_minasona.png";
   }
 }
 
