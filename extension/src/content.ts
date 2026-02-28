@@ -1,6 +1,6 @@
-import { getCommunityName, UPDATE_INTERVAL } from "./config";
+import { UPDATE_INTERVAL } from "./config";
 import { showMinasonaPopover } from "./minasona-popover";
-import { managerEntry, MinasonaStorage, PalsonaEntry } from "./types";
+import { communityData, managerEntry, MinasonaStorage, PalsonaEntry } from "./types";
 import browser from "webextension-polyfill";
 
 let thisExtensionDisabled = false;
@@ -8,6 +8,7 @@ handleMinasonaExtension();
 
 // the mapping of twitch usernames to minasona names and image urls
 let minasonaMap: MinasonaStorage = {};
+let communityMap: Record<string, communityData> = {};
 
 // the currently observed chat container and its observer
 let currentChatContainer: HTMLElement | null = null;
@@ -36,13 +37,13 @@ async function applySettings() {
     "palsonaLimit",
     "iconSize",
   ]);
-  const communityResponse: { communities?: string[] } = await browser.storage.local.get(["communities"]);
-  const communities = communityResponse.communities || [];
+  const communityResponse: { communities?: Record<string, communityData> } = await browser.storage.local.get(["communities"]);
+  communityMap = communityResponse.communities || {};
 
   if (settingPalsonaManagerList != result.palsonaManagerList) {
     settingPalsonaManagerList = result.palsonaManagerList ?? [
       { dataId: "current-channel", enabled: true },
-      ...communities.map((community) => {
+      ...Object.keys(communityMap).map((community) => {
         return { dataId: community, enabled: true };
       }),
     ];
@@ -321,7 +322,7 @@ function createPalsonaIcon(ps: PalsonaEntry): HTMLPictureElement {
   img.style.height = `${settingIconSize || "32"}px`;
 
   const icon = document.createElement("picture");
-  icon.title = `${getCommunityName(ps.communityName)} (${ps.communityName.charAt(0).toUpperCase()}${ps.communityName.slice(1)})`;
+  icon.title = `${communityMap[ps.communityName]?.nameSingular || "Palsona"} (${ps.communityName.charAt(0).toUpperCase()}${ps.communityName.slice(1)})`;
   icon.appendChild(source);
   icon.appendChild(img);
   // add popover on click if its not a default minasona

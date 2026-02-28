@@ -1,5 +1,5 @@
 import browser from "webextension-polyfill";
-import { MinasonaStorage } from "./types";
+import { communityData, MinasonaStorage } from "./types";
 import { UPDATE_INTERVAL } from "./config";
 
 /**
@@ -14,7 +14,13 @@ async function updateMinasonaMap() {
       },
     });
     const data: Record<string, { twitchUsername?: string; avif64?: string; png64?: string; avif256?: string; png256?: string }[]> = await response.json();
-    const communities = Object.keys(data).filter((community) => data[community].length > 0);
+    const communityResponse = await fetch(`https://storage.googleapis.com/minawan-pics.firebasestorage.app/meta.json`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const communityData: { channels: Record<string, communityData> } = await communityResponse.json();
 
     const reducedData: MinasonaStorage = {};
     Object.entries(data).forEach(([communityName, members]) => {
@@ -34,7 +40,7 @@ async function updateMinasonaMap() {
       });
     });
 
-    browser.storage.local.set({ minasonaMap: reducedData, lastUpdate: new Date().getTime(), communities: communities });
+    browser.storage.local.set({ minasonaMap: reducedData, lastUpdate: new Date().getTime(), communities: communityData.channels });
     console.log(`${new Date().toLocaleTimeString()} Minasona map updated.`);
   } catch (error) {
     console.error(`${new Date().toLocaleTimeString()} Failed to fetch minasonas: `, error);

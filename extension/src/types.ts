@@ -18,3 +18,11 @@ export interface managerEntry {
   dataId: string;
   enabled: boolean;
 }
+
+export interface communityData {
+  makerUrl: string;
+  iconUrl: string;
+  genericImageUrl: string;
+  nameSingular: string;
+  namePlural: string;
+}

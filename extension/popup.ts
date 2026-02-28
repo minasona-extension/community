@@ -1,8 +1,9 @@
 import browser from "webextension-polyfill";
-import { managerEntry } from "./src/types";
-import { getCommunityName, getIconSrc } from "./src/config";
+import { communityData, managerEntry } from "./src/types";
 
 document.addEventListener("DOMContentLoaded", main);
+
+let communityMap: Record<string, communityData> = {};
 
 async function main() {
   // init states
@@ -12,9 +13,10 @@ async function main() {
     "palsonaLimit",
     "iconSize",
   ]);
-  const communityResult: { communities?: string[] } = await browser.storage.local.get(["communities"]);
+  const communityResult: { communities?: Record<string, communityData> } = await browser.storage.local.get(["communities"]);
+  communityMap = communityResult.communities;
 
-  handlePalsonaManager(result.palsonaManagerList, communityResult.communities);
+  handlePalsonaManager(result.palsonaManagerList);
   handleAmountSlider(parseInt(result.palsonaLimit));
   handleSizeSlider(parseInt(result.iconSize));
   updateTwitchPreview();
@@ -43,32 +45,33 @@ function disableSettingsPage() {
  * @param communities
  * @returns
  */
-function createCurrentManagerList(managerList: managerEntry[], communities: string[]): managerEntry[] {
+function createCurrentManagerList(managerList: managerEntry[]): managerEntry[] {
   if (!managerList) {
     return [
       { dataId: "current-channel", enabled: true },
-      ...communities.map((community) => {
+      ...Object.keys(communityMap).map((community) => {
         return { dataId: community, enabled: true };
       }),
     ];
   }
 
   // remove items that are no longer in communities
-  const cleanedManagerList = managerList.filter((entry) => entry.dataId === "current-channel" || communities.includes(entry.dataId));
+  const cleanedManagerList = managerList.filter((entry) => entry.dataId === "current-channel" || Object.keys(communityMap).includes(entry.dataId));
 
   // find communities that aren't in the managerlist
   const existingCommunities = managerList.map((entry) => entry.dataId);
-  const newEntries: managerEntry[] = communities.filter((com) => !existingCommunities.includes(com)).map((com) => ({ dataId: com, enabled: true }));
+  const newEntries: managerEntry[] = Object.keys(communityMap)
+    .filter((com) => !existingCommunities.includes(com))
+    .map((com) => ({ dataId: com, enabled: true }));
 
   return [...cleanedManagerList, ...newEntries];
 }
 
-function handlePalsonaManager(managerList: managerEntry[], communities: string[]) {
-  const cleanedManagerList = createCurrentManagerList(managerList, communities || []);
+function handlePalsonaManager(managerList: managerEntry[]) {
+  const cleanedManagerList = createCurrentManagerList(managerList);
 
   // init state
   const managerElement = document.getElementById("palsona-manager") as HTMLDivElement;
-
   for (const entry of cleanedManagerList) {
     // create channel item here
     const currentChannelItem = document.createElement("div");
@@ -95,16 +98,16 @@ function handlePalsonaManager(managerList: managerEntry[], communities: string[]
     label.append(input);
 
     const span = document.createElement("span");
-    span.innerText = getCommunityName(entry.dataId);
+    span.innerText = communityMap[entry.dataId]?.namePlural || (entry.dataId === "current-channel" ? "Current Channel Palsonas" : entry.dataId);
     if (entry.dataId !== "current-channel") {
-      span.title = `${entry.dataId}'s community`;
+      span.title = `${entry.dataId.charAt(0).toUpperCase()}${entry.dataId.slice(1)}'s Community`;
     }
     label.append(span);
 
     const palsonaImage = document.createElement("img");
     palsonaImage.classList.add("minasona-icon");
     palsonaImage.draggable = false;
-    palsonaImage.src = getIconSrc(entry.dataId);
+    palsonaImage.src = communityMap[entry.dataId]?.iconUrl || "assets/unknown_minasona.png";
     span.prepend(palsonaImage);
 
     managerElement.append(currentChannelItem);
@@ -210,7 +213,7 @@ function updateTwitchPreview() {
     const checked = item.querySelector("input")?.checked;
     if (!checked || iconIndex >= minasonaIcons.length || iconIndex >= palsonaAmountVal || (iconIndex > 0 && item.dataset.id === "default-minasona")) return;
     minasonaIcons[iconIndex].style.display = "inline-block";
-    minasonaIcons[iconIndex].src = getIconSrc(item.dataset.id);
+    minasonaIcons[iconIndex].src = communityMap[item.dataset.id]?.iconUrl || "assets/unknown_minasona.png";
     iconIndex++;
   });
   for (let i = iconIndex; i < minasonaIcons.length; i++) {
