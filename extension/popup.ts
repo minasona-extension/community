@@ -87,7 +87,6 @@ function handlePalsonaManager(managerList: managerEntry[]) {
     const dragImg = document.createElement("img");
     dragImg.style.height = "24px";
     dragImg.style.cursor = "grab";
-    dragImg.style.fill = "white";
     dragImg.draggable = false;
     dragImg.src = "assets/drag-handle-svgrepo-com.svg";
     label.append(dragImg);
@@ -103,6 +102,25 @@ function handlePalsonaManager(managerList: managerEntry[]) {
       span.title = `${entry.dataId.charAt(0).toUpperCase()}${entry.dataId.slice(1)}'s Community`;
     }
     label.append(span);
+
+    // add upload icon for channels which have a maker site
+    if (communityMap[entry.dataId]?.makerUrl) {
+      const link = document.createElement("a");
+      link.href = communityMap[entry.dataId]?.makerUrl;
+      link.target = "_blank";
+      link.style.marginLeft = "auto";
+      link.addEventListener("click", (event) => {
+        event.stopPropagation();
+      });
+
+      const uploadImg = document.createElement("img");
+      uploadImg.style.height = "24px";
+      uploadImg.draggable = false;
+      uploadImg.src = "assets/upload-minimalistic-svgrepo-com.svg";
+
+      link.append(uploadImg);
+      label.append(link);
+    }
 
     const palsonaImage = document.createElement("img");
     palsonaImage.classList.add("minasona-icon");
