@@ -12,6 +12,7 @@ let communityMap: Record<string, communityData> = {};
 
 // the currently observed chat container and its observer
 let currentChatContainer: HTMLElement | null = null;
+let chatContainerScroller: HTMLElement | null = null;
 let currentObserver: MutationObserver | null = null;
 // the user list for the current chat with the current settings
 // this list is used, so we don't have to recalculate which palsona to use each time a user chats
@@ -135,6 +136,7 @@ function startSupervisor() {
     if (nativeChatContainer) {
       if (currentChatContainer !== nativeChatContainer) {
         mountObserver(nativeChatContainer);
+        chatContainerScroller = nativeChatContainer.parentElement;
       }
       return;
     }
@@ -218,6 +220,7 @@ function disconnectObserver() {
     currentObserver = null;
   }
   currentChatContainer = null;
+  chatContainerScroller = null;
 }
 
 /**
@@ -372,6 +375,22 @@ function displayMinasonaIconContainer(node: HTMLElement, iconContainer: HTMLDivE
     iconContainer.style.marginRight = "2px";
     // just prepend iconContainer to name
     usernameElement.prepend(iconContainer);
+    // manually scroll the chat to the bottom so the last message is not cut off if the user chose large icons
+    smartScrollNativeChat();
     return;
   }
+}
+
+/**
+ * Scrolls the native Twitch chat window to the bottom if below a threshold.
+ */
+function smartScrollNativeChat() {
+  console.log("smart scroll");
+  if (!chatContainerScroller) return;
+
+  const threshold = 150; // pixels from bottom
+  const isAtBottom = chatContainerScroller.scrollHeight - chatContainerScroller.scrollTop - chatContainerScroller.clientHeight < threshold;
+
+  if (!isAtBottom) return;
+  chatContainerScroller.scrollTop = chatContainerScroller.scrollHeight;
 }
