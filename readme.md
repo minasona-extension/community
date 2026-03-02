@@ -19,7 +19,7 @@ Logo Art - [Anzeal](https://x.com/Anzeal14)
 
 Community & Project Strategy - Heroilde
 
-## Out Soon
+## Out Now!
 
 ### Chrome v1.0
 https://chromewebstore.google.com/detail/eiceflbbckfcbmkeinpjkcibaenlmhff
@@ -34,6 +34,12 @@ https://chromewebstore.google.com/detail/eiceflbbckfcbmkeinpjkcibaenlmhff
 https://addons.mozilla.org/de/firefox/addon/palsona-twitch-badges/
 
 ## Changelog
+
+### 1.5
+
+- Added upload buttons to channel list in extension popup which redirect to the corresponding maker sites
+- Current channel detected in popout chats and mod view
+- Fixed a bug where the chat would not scroll to the very end with large palsona icons
 
 ### 1.0
 
