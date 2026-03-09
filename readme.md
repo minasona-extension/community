@@ -21,16 +21,16 @@ Community & Project Strategy - Heroilde
 
 ## Out Now!
 
-### Chrome v1.0
+### Chrome v1.5
 https://chromewebstore.google.com/detail/eiceflbbckfcbmkeinpjkcibaenlmhff
 
-### Edge v1.0
+### Edge v1.5
 [Download from chrome store](https://chromewebstore.google.com/detail/eiceflbbckfcbmkeinpjkcibaenlmhff)
 
-### Opera v1.0
+### Opera v1.5
 [Download from chrome store](https://chromewebstore.google.com/detail/eiceflbbckfcbmkeinpjkcibaenlmhff)
 
-### Firefox v1.0
+### Firefox v1.5
 https://addons.mozilla.org/de/firefox/addon/palsona-twitch-badges/
 
 ## Changelog
@@ -39,7 +39,7 @@ https://addons.mozilla.org/de/firefox/addon/palsona-twitch-badges/
 
 - Added upload buttons to channel list in extension popup which redirect to the corresponding maker sites
 - Current channel detected in popout chats and mod view
-- Fixed a bug where the chat would not scroll to the very end with large palsona icons
+- Fixed a bug where the chat would not scroll to the very bottom with large palsona icons
 
 ### 1.0
 

@@ -357,6 +357,7 @@ function displayMinasonaIconContainer(node: HTMLElement, iconContainer: HTMLDivE
     iconContainer.style.marginLeft = "2px";
     // append to badge slot
     sevenTvBadgeSlot.append(iconContainer);
+    fixLinebreak(usernameElement, true);
     return;
   }
 
@@ -366,6 +367,7 @@ function displayMinasonaIconContainer(node: HTMLElement, iconContainer: HTMLDivE
     iconContainer.style.marginRight = "2px";
     // append to badge slot
     ffzBadgeSlot.append(iconContainer);
+    fixLinebreak(usernameElement, false);
     return;
   }
 
@@ -375,6 +377,7 @@ function displayMinasonaIconContainer(node: HTMLElement, iconContainer: HTMLDivE
     iconContainer.style.marginRight = "2px";
     // just prepend iconContainer to name
     usernameElement.prepend(iconContainer);
+    fixLinebreak(usernameElement, true);
     // manually scroll the chat to the bottom so the last message is not cut off if the user chose large icons
     smartScrollNativeChat();
     return;
@@ -393,4 +396,23 @@ function smartScrollNativeChat() {
 
   if (!isAtBottom) return;
   chatContainerScroller.scrollTop = chatContainerScroller.scrollHeight;
+}
+
+/**
+ * Makes sure the username stays in one piece when it becomes longer than one line.
+ * Also makes sure the chat message starts right behind the name even in case of a line break.
+ * @param usernameElement The username element of the chat message.
+ * @param fixInline Whether to fix the inline blocks in the chat message DOM.
+ */
+function fixLinebreak(usernameElement: HTMLElement, fixInline: boolean) {
+  if (fixInline) {
+    // username is always a div but text is always a span ... - not needed on FFZ!
+    usernameElement.parentElement.parentElement.childNodes.forEach((child) => {
+      if (!(child instanceof HTMLElement)) return;
+      child.style.setProperty("display", "inline", "important");
+    });
+  }
+  // add line breaking to username element
+  usernameElement.style.wordBreak = "normal";
+  // todo check vods
 }
