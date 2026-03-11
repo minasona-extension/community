@@ -7,14 +7,18 @@ let communityMap: Record<string, communityData> = {};
 
 async function main() {
   // init states
-  const result: { disabled?: boolean; palsonaManagerList?: managerEntry[]; palsonaLimit?: string; iconSize?: string } = await browser.storage.sync.get([
-    "disabled",
-    "palsonaManagerList",
-    "palsonaLimit",
-    "iconSize",
-  ]);
+  const palsonasInUserCardsCheckbox = document.getElementById("palsonasInUserCards") as HTMLInputElement;
+
+  const result: { disabled?: boolean; palsonaManagerList?: managerEntry[]; palsonaLimit?: string; iconSize?: string; palsonasInUserCards?: boolean } =
+    await browser.storage.sync.get(["disabled", "palsonaManagerList", "palsonaLimit", "iconSize", "palsonasInUserCards"]);
   const communityResult: { communities?: Record<string, communityData> } = await browser.storage.local.get(["communities"]);
   communityMap = communityResult.communities;
+
+  palsonasInUserCardsCheckbox.checked = result.palsonasInUserCards ?? true;
+  palsonasInUserCardsCheckbox.addEventListener("change", () => {
+    const isChecked = palsonasInUserCardsCheckbox.checked;
+    browser.storage.sync.set({ palsonasInUserCards: isChecked });
+  });
 
   handlePalsonaManager(result.palsonaManagerList);
   handleAmountSlider(parseInt(result.palsonaLimit));

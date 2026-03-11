@@ -25,6 +25,7 @@ let currentPalsonaList: { [username: string]: PalsonaEntry[] } = {};
 let settingPalsonaManagerList: managerEntry[] = [{ dataId: "current-channel", enabled: true }];
 let settingPalsonaLimit = "3";
 let settingIconSize = "32";
+let settingPalsonasInUserCards = true;
 
 applySettings();
 fetchMinasonaMap();
@@ -36,11 +37,8 @@ setInterval(fetchMinasonaMap, UPDATE_INTERVAL * 60 * 1000);
  * Fetches settings from the browsers storage and applies them to the local variables.
  */
 async function applySettings() {
-  const result: { palsonaManagerList?: managerEntry[]; palsonaLimit?: string; iconSize?: string } = await browser.storage.sync.get([
-    "palsonaManagerList",
-    "palsonaLimit",
-    "iconSize",
-  ]);
+  const result: { palsonaManagerList?: managerEntry[]; palsonaLimit?: string; iconSize?: string; palsonasInUserCards?: boolean } =
+    await browser.storage.sync.get(["palsonaManagerList", "palsonaLimit", "iconSize", "palsonasInUserCards"]);
   const communityResponse: { communities?: Record<string, communityData> } = await browser.storage.local.get(["communities"]);
   communityMap = communityResponse.communities || {};
 
@@ -59,6 +57,14 @@ async function applySettings() {
 
   if (settingIconSize != result.iconSize) {
     settingIconSize = result.iconSize || "32";
+  }
+
+  if (settingPalsonasInUserCards != result.palsonasInUserCards) {
+    settingPalsonasInUserCards = result.palsonasInUserCards ?? true;
+    // reload observers
+    if (currentChatContainer) {
+      mountObserver(currentChatContainer);
+    }
   }
 
   // reset current lookup list because settings changed and it needs to be regenerated
@@ -211,8 +217,10 @@ function mountObserver(container: HTMLElement) {
   });
   currentObserver.observe(container, { childList: true, subtree: true });
 
-  startNativeUsercardObserver();
-  startSevenTvUsercardObserver();
+  if (settingPalsonasInUserCards) {
+    startNativeUsercardObserver();
+    startSevenTvUsercardObserver();
+  }
 }
 
 function startNativeUsercardObserver() {

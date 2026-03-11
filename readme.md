@@ -38,7 +38,7 @@ https://addons.mozilla.org/de/firefox/addon/palsona-twitch-badges/
 ### 1.6
 
 - Added Palsonas to Twitch user cards (can be turned off in the options)
-- Fix: Chat messages now line-break correctly with very large Palsona icons
+- Fixed a bug where chat messages would not line-break correctly with very large Palsona icons
 
 ### 1.5
 
