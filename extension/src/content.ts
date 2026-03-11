@@ -14,6 +14,9 @@ let communityMap: Record<string, communityData> = {};
 let currentChatContainer: HTMLElement | null = null;
 let chatContainerScroller: HTMLElement | null = null;
 let currentObserver: MutationObserver | null = null;
+let currentNativeUsercardObserver: MutationObserver | null = null;
+let currentSevenTvUsercardObserver: MutationObserver | null = null;
+let currentChannelName: string = "";
 // the user list for the current chat with the current settings
 // this list is used, so we don't have to recalculate which palsona to use each time a user chats
 let currentPalsonaList: { [username: string]: PalsonaEntry[] } = {};
@@ -178,37 +181,83 @@ function mountObserver(container: HTMLElement) {
 
   currentChatContainer = container;
 
-  let channelName = "";
   // get current channel name from url
   const path = window.location.pathname.toLowerCase();
   const pathItems = path.split("/").filter((seq) => seq.length > 0);
   for (let i = 0; i < pathItems.length; i++) {
     const item = pathItems[i];
     if (item !== "moderator" && item !== "popout") {
-      channelName = item;
+      currentChannelName = item;
       break;
     }
   }
 
   // handle vods
-  if (channelName === "videos") {
-    channelName = getChannelNameFromTwitch();
+  if (currentChannelName === "videos") {
+    currentChannelName = getChannelNameFromTwitch();
   }
-  if (channelName === "") return;
+  if (currentChannelName === "") return;
 
   // process existing children
-  Array.from(container.children).forEach((node) => processNode(node, channelName));
+  Array.from(container.children).forEach((node) => processNode(node));
 
   // create and start observer
   currentObserver = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
       mutation.addedNodes.forEach((node) => {
-        processNode(node, channelName);
+        processNode(node);
       });
     });
   });
-
   currentObserver.observe(container, { childList: true, subtree: true });
+
+  startNativeUsercardObserver();
+  startSevenTvUsercardObserver();
+}
+
+function startNativeUsercardObserver() {
+  const popupLayer = document.querySelector<HTMLElement>(".viewer-card-layer");
+  if (!popupLayer) return;
+
+  currentNativeUsercardObserver = new MutationObserver(() => {
+    // check if popup layer contains elements
+    if (popupLayer.childElementCount == 0) return;
+    // check if banner already added
+    if (popupLayer.querySelector<HTMLElement>(".viewer-card-palsona")) return;
+
+    const nameTag = popupLayer.querySelector<HTMLLinkElement>("a");
+    if (!nameTag || nameTag.innerText.length == 0) return;
+    const viewerCard = popupLayer.querySelector<HTMLElement>("#VIEWER_CARD_ID");
+    if (!viewerCard) return;
+    const palsonaBanner = createPalsonaBanner(nameTag.innerText.toLowerCase());
+    if (!palsonaBanner) return;
+    addPalsonaSectionToViewerCard(viewerCard, palsonaBanner);
+  });
+  currentNativeUsercardObserver.observe(popupLayer, { childList: true, subtree: true });
+}
+
+function startSevenTvUsercardObserver() {
+  const popupLayer = document.querySelector<HTMLElement>("#seventv-float-context");
+  if (!popupLayer) return;
+
+  currentSevenTvUsercardObserver = new MutationObserver(() => {
+    // check if popup layer contains elements
+    if (popupLayer.childElementCount == 0) return;
+    // for each card
+    for (const usercard of Array.from(popupLayer.children)) {
+      // check if banner already added
+      if (usercard.querySelector<HTMLElement>(".viewer-card-palsona")) continue;
+
+      const nameTag = usercard.querySelector<HTMLElement>(".seventv-chat-user-username");
+      if (!nameTag) continue;
+      const seventvViewerCard = usercard.querySelector<HTMLElement>(".seventv-user-card");
+      if (!seventvViewerCard) continue;
+      const palsonaBanner = createPalsonaBanner(nameTag.innerText.toLowerCase());
+      if (!palsonaBanner) continue;
+      addPalsonaSectionToViewerCard(seventvViewerCard, palsonaBanner);
+    }
+  });
+  currentSevenTvUsercardObserver.observe(popupLayer, { childList: true, subtree: false });
 }
 
 /**
@@ -221,6 +270,15 @@ function disconnectObserver() {
   }
   currentChatContainer = null;
   chatContainerScroller = null;
+
+  if (currentNativeUsercardObserver) {
+    currentNativeUsercardObserver.disconnect();
+    currentNativeUsercardObserver = null;
+  }
+  if (currentSevenTvUsercardObserver) {
+    currentSevenTvUsercardObserver.disconnect();
+    currentSevenTvUsercardObserver = null;
+  }
 }
 
 /**
@@ -245,7 +303,7 @@ function getUsernameElement(node: HTMLElement): HTMLElement {
  * This function checks the username of the author and adds the icon(s) if criteria are met.
  * @param node The added node to process.
  */
-function processNode(node: Node, channelName: string) {
+function processNode(node: Node) {
   if (!(node instanceof HTMLElement)) return;
 
   // palsona-icon already appended
@@ -259,7 +317,7 @@ function processNode(node: Node, channelName: string) {
 
   if (!currentPalsonaList[username]) {
     // calculate palsonas to display for this user based on current channel and settings
-    currentPalsonaList[username] = getPalsonaPriorityList(minasonaMap[username] || {}, channelName);
+    currentPalsonaList[username] = getPalsonaPriorityList(minasonaMap[username] || {});
   }
 
   if (currentPalsonaList[username].length == 0) return;
@@ -281,10 +339,10 @@ function processNode(node: Node, channelName: string) {
  * The default Minasona is only inserted if the list is empty when its their turn in the priority list.
  *
  * @param userElement The user element from the Minasona storage.
- * @param currentChannelName The currently watched channel name.
+ * @param applyLimit Whether to use the user specified limit or display all palsonas.
  * @returns An array of PalsonaEntrys representing the priority of display.
  */
-function getPalsonaPriorityList(userElement: { [communityName: string]: PalsonaEntry }, currentChannelName: string): PalsonaEntry[] {
+function getPalsonaPriorityList(userElement: { [communityName: string]: PalsonaEntry }, applyLimit: boolean = true): PalsonaEntry[] {
   // return array to populate
   const palsonaPrioList: PalsonaEntry[] = [];
   // user set prio list without disabled entries
@@ -295,7 +353,7 @@ function getPalsonaPriorityList(userElement: { [communityName: string]: PalsonaE
   const limit = parseInt(settingPalsonaLimit);
 
   for (const prio of cleanedManagerPrioList) {
-    if (index == limit) break;
+    if (applyLimit && index == limit) break;
 
     const prioString = prio.dataId === "current-channel" ? currentChannelName : prio.dataId;
     if (userElement[prioString]) {
@@ -311,18 +369,20 @@ function getPalsonaPriorityList(userElement: { [communityName: string]: PalsonaE
 /**
  * Creates a palsona icon for the Twitch chat user and returns the element.
  * @param ps The palsona entry to create the icon for.
+ * @param manualHeight Whether to use the user specified height or a manual set height.
  * @returns The icon element.
  */
-function createPalsonaIcon(ps: PalsonaEntry): HTMLPictureElement {
+function createPalsonaIcon(ps: PalsonaEntry, manualHeight?: string): HTMLPictureElement {
   const source = document.createElement("source");
   source.srcset = ps.iconUrl;
   source.type = "image/avif";
 
   const img = document.createElement("img");
   img.src = ps.fallbackIconUrl;
+  img.draggable = false;
   img.loading = "lazy";
   img.classList.add("palsona-icon");
-  img.style.height = `${settingIconSize || "32"}px`;
+  img.style.height = `${manualHeight ? manualHeight : settingIconSize || "32"}px`;
 
   const icon = document.createElement("picture");
   icon.title = `${communityMap[ps.communityName]?.nameSingular || "Palsona"} (${ps.communityName.charAt(0).toUpperCase()}${ps.communityName.slice(1)})`;
@@ -388,7 +448,6 @@ function displayMinasonaIconContainer(node: HTMLElement, iconContainer: HTMLDivE
  * Scrolls the native Twitch chat window to the bottom if below a threshold.
  */
 function smartScrollNativeChat() {
-  console.log("smart scroll");
   if (!chatContainerScroller) return;
 
   const threshold = 150; // pixels from bottom
@@ -414,5 +473,31 @@ function fixLinebreak(usernameElement: HTMLElement, fixInline: boolean) {
   }
   // add line breaking to username element
   usernameElement.style.wordBreak = "normal";
-  // todo check vods
+}
+
+function addPalsonaSectionToViewerCard(viewerCard: HTMLElement, bannerElement: HTMLElement) {
+  const viewerCardElement = viewerCard.childNodes[0] as HTMLElement;
+  viewerCardElement.insertBefore(bannerElement, viewerCardElement.childNodes[1]);
+}
+
+function createPalsonaBanner(username: string): HTMLElement {
+  if (!minasonaMap[username]) return;
+  const container = document.createElement("div");
+  container.classList.add("viewer-card-palsona");
+
+  const title = document.createElement("div");
+  title.classList.add("viewer-card-palsona-title");
+  title.innerText = "Palsonas";
+  container.appendChild(title);
+
+  const palsonaContainer = document.createElement("div");
+  palsonaContainer.classList.add("viewer-card-palsona-container");
+  for (const ps of getPalsonaPriorityList(minasonaMap[username] || {}, false)) {
+    const icon = createPalsonaIcon(ps, "64");
+    icon.style.marginLeft = "2px";
+    icon.style.marginRight = "2px";
+    palsonaContainer.append(icon);
+  }
+  container.appendChild(palsonaContainer);
+  return container;
 }
