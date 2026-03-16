@@ -387,7 +387,7 @@ function getPalsonaPriorityList(userElement: { [communityName: string]: PalsonaE
   // return array to populate
   const palsonaPrioList: PalsonaEntry[] = [];
   // user set prio list without disabled entries
-  const cleanedManagerPrioList: managerEntry[] = settingPalsonaManagerList.filter((prio) => prio.enabled);
+  const cleanedManagerPrioList: managerEntry[] = applyLimit ? settingPalsonaManagerList.filter((prio) => prio.enabled) : settingPalsonaManagerList;
 
   // count how many icons we inserted, so we don't go over the limit
   let index = 0;
