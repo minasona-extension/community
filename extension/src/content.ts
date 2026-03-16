@@ -162,6 +162,18 @@ function startSupervisor() {
     if (currentChatContainer && !document.body.contains(currentChatContainer)) {
       disconnectObserver();
     }
+
+    // handle popout viewercards
+    // if settingUsercards && url contains "viewercard" -> detect elements in DOM but no observer needed since page is pretty much static
+    // viewercard url structure: https://www.twitch.tv/popout/CHANNEL/viewercard/USER?popout=
+    if (!settingPalsonasInUserCards) return;
+
+    const path = window.location.pathname.toLowerCase();
+    const pathItems = path.split("/").filter((seq) => seq.length > 0);
+    if (!pathItems.includes("viewercard")) return;
+
+    currentChannelName = pathItems[1];
+    handlePopoutUsercard(pathItems[3]);
   }, 5000);
 }
 
@@ -223,6 +235,24 @@ function mountObserver(container: HTMLElement) {
   }
 }
 
+/**
+ * Statically checks if a usercard is on the page and adds Palsonas to it.
+ * @param username Username of the user.
+ */
+function handlePopoutUsercard(username: string) {
+  const viewerCard = document.querySelector<HTMLElement>("#VIEWER_CARD_ID");
+  if (!viewerCard) return;
+
+  if (viewerCard.querySelector<HTMLElement>(".viewer-card-palsona")) return;
+
+  const palsonaBanner = createPalsonaBanner(username);
+  if (!palsonaBanner) return;
+  addPalsonaSectionToViewerCard(viewerCard, palsonaBanner);
+}
+
+/**
+ * Starts the observer that observes the native popup layer and adds Palsonas to usercards when detected.
+ */
 function startNativeUsercardObserver() {
   const popupLayer = document.querySelector<HTMLElement>(".viewer-card-layer");
   if (!popupLayer) return;
@@ -244,6 +274,9 @@ function startNativeUsercardObserver() {
   currentNativeUsercardObserver.observe(popupLayer, { childList: true, subtree: true });
 }
 
+/**
+ * Starts the observer that observes the 7tv popup layer and adds Palsonas to usercards when detected.
+ */
 function startSevenTvUsercardObserver() {
   const popupLayer = document.querySelector<HTMLElement>("#seventv-float-context");
   if (!popupLayer) return;
