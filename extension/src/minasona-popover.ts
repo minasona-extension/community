@@ -1,5 +1,8 @@
+import browser from "webextension-polyfill";
+
 // the popover showing the minasona image when clicking the icon
 let popoverInstance: HTMLElement = null;
+let pettingTimeout: NodeJS.Timeout = null;
 
 /**
  * Gets or creates the popover element for displaying the enlarged minasona image.
@@ -19,11 +22,27 @@ function getOrCreatePopover(): HTMLElement {
     source.type = "image/avif";
     const img = document.createElement("img");
     img.loading = "lazy";
+    img.addEventListener("click", () => {
+      if (popoverInstance.classList.contains("petting")) return;
+
+      popoverInstance.classList.add("petting");
+
+      pettingTimeout = setTimeout(() => {
+        popoverInstance.classList.remove("petting");
+      }, 3000);
+    });
 
     const picture = document.createElement("picture");
     picture.appendChild(source);
     picture.appendChild(img);
     popoverInstance.appendChild(picture);
+
+    // add petpet effect
+    const petElement = document.createElement("div");
+    petElement.classList.add("pet-sprite");
+    const petImageUrl = browser.runtime.getURL("assets/petpet-sprite.png");
+    petElement.style.backgroundImage = `url(${petImageUrl})`;
+    popoverInstance.appendChild(petElement);
 
     document.body.append(popoverInstance);
 
@@ -31,10 +50,17 @@ function getOrCreatePopover(): HTMLElement {
     document.addEventListener("click", (e) => {
       if (popoverInstance.classList.contains("active") && !popoverInstance.contains(e.target as HTMLElement)) {
         popoverInstance.classList.remove("active");
+        resetPettingEffect(popoverInstance);
       }
     });
   }
+  resetPettingEffect(popoverInstance);
   return popoverInstance;
+}
+
+function resetPettingEffect(popoverInstance: HTMLElement) {
+  popoverInstance.classList.remove("petting");
+  clearTimeout(pettingTimeout);
 }
 
 /**

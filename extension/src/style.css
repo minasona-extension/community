@@ -20,6 +20,7 @@
   border-radius: 6px;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
   z-index: 99999;
+  cursor: pointer;
 
   /* Flexbox to center the image inside the 250x250 box */
   display: flex;
@@ -46,6 +47,8 @@
   max-height: 200px;
   object-fit: contain; /* Keeps aspect ratio */
   opacity: 0;
+  display: block;
+  transform-origin: bottom center;
 }
 
 .twitch-minasona-popover img.loaded {
@@ -67,13 +70,62 @@
   }
 }
 
-.petting-effect {
+/* Petpet Effect */
+
+.pet-sprite {
   position: absolute;
-  pointer-events: none;
   top: 0px;
-  z-index: 100000;
-  width: 90%;
+  transform: scale(1.5);
+
+  width: 112px;
+  height: 112px;
+
+  opacity: 0;
+  pointer-events: none;
 }
+
+.twitch-minasona-popover.petting img {
+  animation: squish 0.3125s steps(5) infinite;
+}
+
+.twitch-minasona-popover.petting .pet-sprite {
+  opacity: 1;
+  animation: playHand 0.3125s steps(5) forwards infinite;
+}
+
+@keyframes squish {
+  0%,
+  19.99% {
+    transform: scaleY(1) scaleX(1);
+  }
+  20%,
+  39.99% {
+    transform: scaleY(0.9) scaleX(1.05);
+  }
+  40%,
+  59.99% {
+    transform: scaleY(0.8) scaleX(1.1);
+  }
+  60%,
+  79.99% {
+    transform: scaleY(0.9) scaleX(1.05);
+  }
+  80%,
+  100% {
+    transform: scaleY(1.05) scaleX(0.95);
+  }
+}
+
+@keyframes playHand {
+  from {
+    background-position: 0px;
+  }
+  to {
+    background-position: -560px;
+  }
+}
+
+/* Usercards */
 
 .viewer-card-palsona {
   padding: 8px;
