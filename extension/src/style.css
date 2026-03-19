@@ -74,7 +74,7 @@
 
 .pet-sprite {
   position: absolute;
-  top: 0px;
+  top: 28px;
   transform: scale(1.5);
 
   width: 112px;
@@ -86,6 +86,7 @@
 
 .twitch-minasona-popover.petting img {
   animation: squish 0.3125s steps(5) infinite;
+  animation-delay: 0.05s;
 }
 
 .twitch-minasona-popover.petting .pet-sprite {
@@ -112,7 +113,7 @@
   }
   80%,
   100% {
-    transform: scaleY(1.05) scaleX(0.95);
+    transform: scaleY(0.95) scaleX(1.025);
   }
 }
 
@@ -147,5 +148,5 @@
 }
 
 .seventv-user-card {
-  max-height: 525px !important;
+  max-height: fit-content !important;
 }
