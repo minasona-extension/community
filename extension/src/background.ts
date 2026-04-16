@@ -13,6 +13,9 @@ async function updateMinasonaMap() {
         "Content-Type": "application/json",
       },
     });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
     const data: Record<string, { twitchUsername?: string; avif64?: string; png64?: string; avif256?: string; png256?: string }[]> = await response.json();
     const communityResponse = await fetch(`https://storage.googleapis.com/minawan-pics.firebasestorage.app/meta.json`, {
       method: "GET",
@@ -32,10 +35,10 @@ async function updateMinasonaMap() {
         }
         reducedData[lowerCaseUsername][communityName] = {
           communityName: communityName,
-          iconUrl: isAllowedUrl(m.avif64) ? encodeURI(m.avif64 || "") : "",
-          fallbackIconUrl: isAllowedUrl(m.png64) ? encodeURI(m.png64 || "") : "",
-          imageUrl: isAllowedUrl(m.avif256) ? encodeURI(m.avif256 || "") : "",
-          fallbackImageUrl: isAllowedUrl(m.png256) ? encodeURI(m.png256 || "") : "",
+          iconUrl: getAllowedUrl(m.avif64),
+          fallbackIconUrl: getAllowedUrl(m.png64),
+          imageUrl: getAllowedUrl(m.avif256),
+          fallbackImageUrl: getAllowedUrl(m.png256),
         };
       });
     });
@@ -50,13 +53,14 @@ async function updateMinasonaMap() {
 /**
  * Checks whether an image URL is allowed.
  */
-function isAllowedUrl(url: string): boolean {
-  if (!url) return true; // empty URLs are ok
+function getAllowedUrl(url: string): string {
+  if (!url) return ""; // empty URLs are ok
   try {
     const parsed = new URL(url);
-    return parsed.protocol === "https:" && parsed.hostname === "storage.googleapis.com" && parsed.pathname.startsWith("/minawan-pics");
+    if (parsed.protocol === "https:" && parsed.hostname === "storage.googleapis.com" && parsed.pathname.startsWith("/minawan-pics")) return parsed.toString();
+    return "";
   } catch {
-    return false;
+    return "";
   }
 }
 
