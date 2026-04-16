@@ -4,6 +4,7 @@ export interface PalsonaEntry {
   fallbackIconUrl: string;
   imageUrl: string;
   fallbackImageUrl: string;
+  backfill: boolean;
 }
 
 /**

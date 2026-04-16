@@ -16,7 +16,8 @@ async function updateMinasonaMap() {
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }
-    const data: Record<string, { twitchUsername?: string; avif64?: string; png64?: string; avif256?: string; png256?: string }[]> = await response.json();
+    const data: Record<string, { twitchUsername?: string; avif64?: string; png64?: string; avif256?: string; png256?: string; backfill?: boolean }[]> =
+      await response.json();
     const communityResponse = await fetch(`https://storage.googleapis.com/minawan-pics.firebasestorage.app/meta.json`, {
       method: "GET",
       headers: {
@@ -36,12 +37,14 @@ async function updateMinasonaMap() {
         if (!reducedData[lowerCaseUsername]) {
           reducedData[lowerCaseUsername] = {};
         }
+        if (reducedData[lowerCaseUsername][communityName] && m.backfill) return;
         reducedData[lowerCaseUsername][communityName] = {
           communityName: communityName,
           iconUrl: getAllowedUrl(m.avif64),
           fallbackIconUrl: getAllowedUrl(m.png64),
           imageUrl: getAllowedUrl(m.avif256),
           fallbackImageUrl: getAllowedUrl(m.png256),
+          backfill: m.backfill ?? false,
         };
       });
     });
