@@ -12,7 +12,7 @@ async function main() {
   const result: { disabled?: boolean; palsonaManagerList?: managerEntry[]; palsonaLimit?: string; iconSize?: string; palsonasInUserCards?: boolean } =
     await browser.storage.sync.get(["disabled", "palsonaManagerList", "palsonaLimit", "iconSize", "palsonasInUserCards"]);
   const communityResult: { communities?: Record<string, communityData> } = await browser.storage.local.get(["communities"]);
-  communityMap = communityResult.communities;
+  communityMap = communityResult.communities || {};
 
   palsonasInUserCardsCheckbox.checked = result.palsonasInUserCards ?? true;
   palsonasInUserCardsCheckbox.addEventListener("change", () => {
