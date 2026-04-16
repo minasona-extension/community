@@ -32,10 +32,10 @@ async function updateMinasonaMap() {
         }
         reducedData[lowerCaseUsername][communityName] = {
           communityName: communityName,
-          iconUrl: encodeURI(m.avif64 || ""),
-          fallbackIconUrl: encodeURI(m.png64 || ""),
-          imageUrl: encodeURI(m.avif256 || ""),
-          fallbackImageUrl: encodeURI(m.png256 || ""),
+          iconUrl: isAllowedUrl(m.avif64) ? encodeURI(m.avif64 || "") : "",
+          fallbackIconUrl: isAllowedUrl(m.png64) ? encodeURI(m.png64 || "") : "",
+          imageUrl: isAllowedUrl(m.avif256) ? encodeURI(m.avif256 || "") : "",
+          fallbackImageUrl: isAllowedUrl(m.png256) ? encodeURI(m.png256 || "") : "",
         };
       });
     });
@@ -44,6 +44,19 @@ async function updateMinasonaMap() {
     console.log(`${new Date().toLocaleTimeString()} Minasona map updated.`);
   } catch (error) {
     console.error(`${new Date().toLocaleTimeString()} Failed to fetch minasonas: `, error);
+  }
+}
+
+/**
+ * Checks whether an image URL is allowed.
+ */
+function isAllowedUrl(url: string): boolean {
+  if (!url) return true; // empty URLs are ok
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "https:" && parsed.hostname === "storage.googleapis.com" && parsed.pathname.startsWith("/minawan-pics");
+  } catch {
+    return false;
   }
 }
 
