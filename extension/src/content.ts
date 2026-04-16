@@ -358,18 +358,18 @@ function processNode(node: Node) {
   const username = usernameElement.innerText.toLowerCase();
   if (!username) return;
 
-  if (!currentPalsonaList[username]) {
+  if (!currentPalsonaList.has(username)) {
     // calculate palsonas to display for this user based on current channel and settings
-    currentPalsonaList[username] = getPalsonaPriorityList(minasonaMap[username] || {});
+    currentPalsonaList.set(username, getPalsonaPriorityList(minasonaMap[username] || {}));
   }
 
-  if (currentPalsonaList[username].length == 0) return;
+  if (currentPalsonaList.get(username).length == 0) return;
 
   // create icon container
   const iconContainer = document.createElement("div");
   iconContainer.classList.add("palsona-icon-container");
 
-  for (const ps of currentPalsonaList[username]) {
+  for (const ps of currentPalsonaList.get(username)) {
     const icon = createPalsonaIcon(ps);
     iconContainer.append(icon);
   }
