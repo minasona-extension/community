@@ -1,8 +1,8 @@
 import browser from "webextension-polyfill";
 
 // the popover showing the minasona image when clicking the icon
-let popoverInstance: HTMLElement = null;
-let pettingTimeout: NodeJS.Timeout = null;
+let popoverInstance: HTMLElement | null = null;
+let pettingTimeout: NodeJS.Timeout | null = null;
 
 /**
  * Gets or creates the popover element for displaying the enlarged minasona image.
@@ -23,12 +23,12 @@ function getOrCreatePopover(): HTMLElement {
     const img = document.createElement("img");
     img.loading = "lazy";
     img.addEventListener("click", () => {
-      if (popoverInstance.classList.contains("petting")) return;
+      if (!popoverInstance || popoverInstance.classList.contains("petting")) return;
 
       popoverInstance.classList.add("petting");
 
       pettingTimeout = setTimeout(() => {
-        popoverInstance.classList.remove("petting");
+        popoverInstance?.classList.remove("petting");
       }, 3000);
     });
 
@@ -48,7 +48,7 @@ function getOrCreatePopover(): HTMLElement {
 
     // logic to close popover when clicking outside
     document.addEventListener("click", (e) => {
-      if (popoverInstance.classList.contains("active") && !popoverInstance.contains(e.target as HTMLElement)) {
+      if (popoverInstance && popoverInstance.classList.contains("active") && !popoverInstance.contains(e.target as HTMLElement)) {
         popoverInstance.classList.remove("active");
         resetPettingEffect(popoverInstance);
       }
@@ -60,7 +60,7 @@ function getOrCreatePopover(): HTMLElement {
 
 function resetPettingEffect(popoverInstance: HTMLElement) {
   popoverInstance.classList.remove("petting");
-  clearTimeout(pettingTimeout);
+  if (pettingTimeout) clearTimeout(pettingTimeout);
 }
 
 /**
@@ -73,11 +73,15 @@ export function showMinasonaPopover(minasonaIcon: HTMLElement, imageUrl: string,
   const popover = getOrCreatePopover();
 
   const picture = popover.querySelector<HTMLPictureElement>("picture");
-  picture.hidden = true;
   const loader = popover.querySelector<HTMLDivElement>(".loader");
-  loader.style.display = "block";
   const source = popover.querySelector<HTMLSourceElement>("source");
   const img = popover.querySelector<HTMLImageElement>("img");
+  if (!picture || !loader || !source || !img) {
+    console.error("[PALSONA EXTENSION] Could not get popover.");
+    return;
+  }
+  picture.hidden = true;
+  loader.style.display = "block";
   img.classList.remove("loaded");
 
   preloadImage(imageUrl)

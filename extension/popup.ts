@@ -20,9 +20,9 @@ async function main() {
     browser.storage.sync.set({ palsonasInUserCards: isChecked });
   });
 
-  handlePalsonaManager(result.palsonaManagerList);
-  handleAmountSlider(parseInt(result.palsonaLimit));
-  handleSizeSlider(parseInt(result.iconSize));
+  handlePalsonaManager(result.palsonaManagerList || []);
+  handleAmountSlider(parseInt(result.palsonaLimit || "2"));
+  handleSizeSlider(parseInt(result.iconSize || "32"));
   updateTwitchPreview();
 
   const lastUpdateResult: { lastUpdate?: string } = await browser.storage.local.get(["lastUpdate"]);
@@ -136,11 +136,12 @@ function handlePalsonaManager(managerList: managerEntry[]) {
   }
 
   // drag & drop
-  let dragSrcEl = null;
+  let dragSrcEl: EventTarget | null = null;
 
   managerElement.addEventListener("dragstart", (e) => {
     if ((e.target as HTMLElement).className === "draggable-item") {
       dragSrcEl = e.target;
+      if (!e.dataTransfer) return;
       e.dataTransfer.effectAllowed = "move";
     }
   });
@@ -157,7 +158,7 @@ function handlePalsonaManager(managerList: managerEntry[]) {
     if (target && target !== dragSrcEl) {
       const rect = target.getBoundingClientRect();
       const next = (e.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
-      managerElement.insertBefore(dragSrcEl, next ? target.nextSibling : target);
+      managerElement.insertBefore(dragSrcEl as any, next ? target.nextSibling : target);
       savePalsonaManagerList(managerElement);
       updateTwitchPreview();
     }
@@ -175,7 +176,7 @@ function handlePalsonaManager(managerList: managerEntry[]) {
 async function savePalsonaManagerList(managerElement: HTMLDivElement) {
   const channelItems = managerElement.querySelectorAll<HTMLDivElement>(".draggable-item");
   const palsonaSaveList: managerEntry[] = Array.from(channelItems).map((item) => {
-    return { dataId: item.dataset.id, enabled: item.querySelector("input")?.checked };
+    return { dataId: item.dataset.id || "undefined", enabled: item.querySelector("input")?.checked || false };
   });
   await browser.storage.sync.set({ palsonaManagerList: palsonaSaveList });
 }
@@ -233,7 +234,14 @@ function updateTwitchPreview() {
   let iconIndex = 0;
   channelItems.forEach((item) => {
     const checked = item.querySelector("input")?.checked;
-    if (!checked || iconIndex >= minasonaIcons.length || iconIndex >= palsonaAmountVal || (iconIndex > 0 && item.dataset.id === "default-minasona")) return;
+    if (
+      !checked ||
+      iconIndex >= minasonaIcons.length ||
+      iconIndex >= palsonaAmountVal ||
+      (iconIndex > 0 && item.dataset.id === "default-minasona") ||
+      !item.dataset.id
+    )
+      return;
     minasonaIcons[iconIndex].style.display = "inline-block";
     minasonaIcons[iconIndex].src = communityMap[item.dataset.id]?.iconUrl || "assets/unknown_minasona.png";
     iconIndex++;
