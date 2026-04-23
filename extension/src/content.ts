@@ -270,7 +270,7 @@ function startNativeUsercardObserver() {
     if (!nameTag || nameTag.innerText.length == 0) return;
     const viewerCard = popupLayer.querySelector<HTMLElement>("#VIEWER_CARD_ID");
     if (!viewerCard) return;
-    const palsonaBanner = createPalsonaBanner(nameTag.innerText.toLowerCase());
+    const palsonaBanner = createPalsonaBanner(handleUsernameLocalization(nameTag.innerText).toLowerCase());
     if (!palsonaBanner) return;
     addPalsonaSectionToViewerCard(viewerCard, palsonaBanner);
   });
@@ -296,7 +296,7 @@ function startSevenTvUsercardObserver() {
       if (!nameTag) continue;
       const seventvViewerCard = usercard.querySelector<HTMLElement>(".seventv-user-card");
       if (!seventvViewerCard) continue;
-      const palsonaBanner = createPalsonaBanner(nameTag.innerText.toLowerCase());
+      const palsonaBanner = createPalsonaBanner(handleUsernameLocalization(nameTag.innerText).toLowerCase());
       if (!palsonaBanner) continue;
       addPalsonaSectionToViewerCard(seventvViewerCard, palsonaBanner);
     }
@@ -343,6 +343,17 @@ function getUsernameElement(node: HTMLElement): HTMLElement | undefined {
 }
 
 /**
+ * API returns only user/account names, NOT display names!
+ * If username contains a bracket it must be in the format `displayname (username)`.
+ * @param username The full name displayed in chat.
+ * @returns The displayname or the full name if no brackets detected.
+ */
+function handleUsernameLocalization(username: string): string {
+  if (username.includes("(")) return username.split("(")[1].slice(0, -1);
+  return username;
+}
+
+/**
  * Processes a node in the chat container.
  * This function checks the username of the author and adds the icon(s) if criteria are met.
  * @param node The added node to process.
@@ -356,7 +367,7 @@ function processNode(node: Node) {
   // get username
   const usernameElement = getUsernameElement(node);
   if (!usernameElement) return;
-  const username = usernameElement.innerText.toLowerCase();
+  const username = handleUsernameLocalization(usernameElement.innerText).toLowerCase();
   if (!username) return;
 
   if (!currentPalsonaList.has(username)) {
