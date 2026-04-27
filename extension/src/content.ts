@@ -20,6 +20,7 @@ let currentChannelName: string = "";
 // the user list for the current chat with the current settings
 // this list is used, so we don't have to recalculate which palsona to use each time a user chats
 const currentPalsonaList = new Map<string, PalsonaEntry[]>();
+const MAX_CACHE_SIZE = 4000;
 
 // settings - initialize with defaults
 let settingPalsonaManagerList: managerEntry[] = [{ dataId: "current-channel", enabled: true }];
@@ -369,6 +370,13 @@ function processNode(node: Node) {
   if (!usernameElement) return;
   const username = handleUsernameLocalization(usernameElement.innerText).toLowerCase();
   if (!username) return;
+
+  // handle currentPalsonaList map size to prevent memory issues
+  if (currentPalsonaList.size > MAX_CACHE_SIZE) {
+    // delete the oldest quarter of the cache
+    const keysToDelete = [...currentPalsonaList.keys()].slice(0, MAX_CACHE_SIZE / 4);
+    keysToDelete.forEach((k) => currentPalsonaList.delete(k));
+  }
 
   if (!currentPalsonaList.has(username)) {
     // calculate palsonas to display for this user based on current channel and settings
