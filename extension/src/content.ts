@@ -218,6 +218,17 @@ function mountObserver(container: HTMLElement) {
   }
   if (currentChannelName === "") return;
 
+  container.addEventListener("click", (e) => {
+    const icon = (e.target as HTMLElement).closest<HTMLElement>(".palsona-icon");
+    if (!icon || !icon.parentElement) return;
+    e.preventDefault();
+    e.stopPropagation();
+    // use parent element since onclick is always <img /> and not created <picture><source /><img /></picture> with data fields
+    const imageUrl = icon.parentElement.dataset.imageUrl;
+    const fallbackUrl = icon.parentElement.dataset.fallbackUrl;
+    if (imageUrl && fallbackUrl) showMinasonaPopover(icon.parentElement, imageUrl, fallbackUrl);
+  });
+
   // process existing children
   Array.from(container.children).forEach((node) => processNode(node));
 
@@ -436,7 +447,7 @@ function getPalsonaPriorityList(userElement: { [communityName: string]: PalsonaE
  * @param manualHeight Whether to use the user specified height or a manual set height.
  * @returns The icon element.
  */
-function createPalsonaIcon(ps: PalsonaEntry, manualHeight?: string): HTMLPictureElement {
+function createPalsonaIcon(ps: PalsonaEntry, manualHeight?: string, addOnClickListener?: boolean): HTMLPictureElement {
   const source = document.createElement("source");
   source.srcset = ps.iconUrl;
   source.type = "image/avif";
@@ -454,12 +465,16 @@ function createPalsonaIcon(ps: PalsonaEntry, manualHeight?: string): HTMLPicture
   icon.appendChild(img);
   // add popover on click if its not a default minasona
   if (ps.imageUrl) {
-    icon.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
+    icon.dataset.imageUrl = ps.imageUrl;
+    icon.dataset.fallbackUrl = ps.fallbackImageUrl;
+    if (addOnClickListener) {
+      icon.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
 
-      showMinasonaPopover(e.target as HTMLElement, ps.imageUrl, ps.fallbackImageUrl);
-    });
+        showMinasonaPopover(e.target as HTMLElement, ps.imageUrl, ps.fallbackImageUrl);
+      });
+    }
   }
 
   return icon;
@@ -557,7 +572,7 @@ function createPalsonaBanner(username: string): HTMLElement | undefined {
   const palsonaContainer = document.createElement("div");
   palsonaContainer.classList.add("viewer-card-palsona-container");
   for (const ps of getPalsonaPriorityList(minasonaMap[username] || {}, false)) {
-    const icon = createPalsonaIcon(ps, "64");
+    const icon = createPalsonaIcon(ps, "64", true);
     icon.style.marginLeft = "2px";
     icon.style.marginRight = "2px";
     palsonaContainer.append(icon);
