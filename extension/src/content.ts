@@ -236,7 +236,6 @@ function mountObserver(container: HTMLElement) {
   currentObserver = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
       mutation.addedNodes.forEach((node) => {
-        if (!(node instanceof HTMLElement)) return;
         processNode(node);
       });
     });
