@@ -133,7 +133,7 @@ function startSupervisor() {
     // get native, 7tv and VOD chat containers
 
     // seven tv has priority
-    const sevenTvChatContainer = document.querySelector<HTMLElement>(".seventv-chat-list");
+    const sevenTvChatContainer = document.querySelector<HTMLElement>(".seventv-chat-list main");
     if (sevenTvChatContainer) {
       if (currentChatContainer !== sevenTvChatContainer) {
         mountObserver(sevenTvChatContainer);
@@ -230,7 +230,7 @@ function mountObserver(container: HTMLElement) {
       });
     });
   });
-  currentObserver.observe(container, { childList: true, subtree: true });
+  currentObserver.observe(container, { childList: true, subtree: false });
 
   if (settingPalsonasInUserCards) {
     startNativeUsercardObserver();
