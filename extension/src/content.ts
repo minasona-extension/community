@@ -229,9 +229,6 @@ function mountObserver(container: HTMLElement) {
     if (imageUrl && fallbackUrl) showMinasonaPopover(icon.parentElement, imageUrl, fallbackUrl);
   });
 
-  // process existing children
-  Array.from(container.children).forEach((node) => processNode(node));
-
   // create and start observer
   currentObserver = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
