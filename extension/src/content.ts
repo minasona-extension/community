@@ -1,4 +1,3 @@
-import { UPDATE_INTERVAL } from "./config";
 import { showMinasonaPopover } from "./minasona-popover";
 import { communityData, managerEntry, MinasonaStorage, PalsonaEntry } from "./types";
 import browser from "webextension-polyfill";
@@ -31,8 +30,6 @@ let settingPalsonasInUserCards = true;
 applySettings();
 fetchMinasonaMap();
 startSupervisor();
-
-setInterval(fetchMinasonaMap, UPDATE_INTERVAL * 60 * 1000);
 
 /**
  * Fetches settings from the browsers storage and applies them to the local variables.
@@ -72,9 +69,11 @@ async function applySettings() {
   currentPalsonaList.clear();
 }
 // listen for settings changes
-browser.storage.onChanged.addListener((_changes, namespace) => {
+browser.storage.onChanged.addListener((changes, namespace) => {
   if (namespace === "sync") {
     applySettings();
+  } else if (namespace === "local" && changes.minasonaMap) {
+    fetchMinasonaMap();
   }
 });
 
