@@ -508,17 +508,22 @@ function displayMinasonaIconContainer(node: HTMLElement, iconContainer: HTMLDivE
   }
 }
 
+let scrollRafId: number | null = null;
 /**
  * Scrolls the native Twitch chat window to the bottom if below a threshold.
  */
 function smartScrollNativeChat() {
-  if (!chatContainerScroller) return;
+  if (scrollRafId) return;
+  scrollRafId = requestAnimationFrame(() => {
+    scrollRafId = null;
 
-  const threshold = 150; // pixels from bottom
-  const isAtBottom = chatContainerScroller.scrollHeight - chatContainerScroller.scrollTop - chatContainerScroller.clientHeight < threshold;
+    if (!chatContainerScroller) return;
+    const threshold = 150; // pixels from bottom
+    const isAtBottom = chatContainerScroller.scrollHeight - chatContainerScroller.scrollTop - chatContainerScroller.clientHeight < threshold;
 
-  if (!isAtBottom) return;
-  chatContainerScroller.scrollTop = chatContainerScroller.scrollHeight;
+    if (!isAtBottom) return;
+    chatContainerScroller.scrollTop = chatContainerScroller.scrollHeight;
+  });
 }
 
 /**
