@@ -541,7 +541,7 @@ function fixLinebreak(usernameElement: HTMLElement, fixInline: boolean) {
     });
   }
   // add line breaking to username element
-  usernameElement.style.wordBreak = "normal";
+  usernameElement.style.wordBreak = "keep-all";
 }
 
 function addPalsonaSectionToViewerCard(viewerCard: HTMLElement, bannerElement: HTMLElement) {
