@@ -131,6 +131,8 @@ function startSupervisor() {
       disconnectObserver();
       return;
     }
+    // if current container unchanged, skip
+    if (currentChatContainer && document.body.contains(currentChatContainer)) return;
     // get native, 7tv and VOD chat containers
 
     // seven tv has priority
