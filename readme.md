@@ -21,34 +21,35 @@ Community & Project Strategy - Heroilde
 
 ## Out Now!
 
-### Chrome v1.5
+### Chrome v1.6.2
 https://chromewebstore.google.com/detail/eiceflbbckfcbmkeinpjkcibaenlmhff
 
-### Edge v1.5
+### Edge v1.6.2
 [Download from chrome store](https://chromewebstore.google.com/detail/eiceflbbckfcbmkeinpjkcibaenlmhff)
 
-### Opera v1.5
+### Opera v1.6.2
 [Download from chrome store](https://chromewebstore.google.com/detail/eiceflbbckfcbmkeinpjkcibaenlmhff)
 
-### Firefox v1.5
+### Firefox v1.6.2
 https://addons.mozilla.org/de/firefox/addon/palsona-twitch-badges/
 
 ## Changelog
 
-### 1.6
+#### 1.6.2
+- Support for users with arabic, chinese or japanese names using the localization feature on Twitch
+- Performance improvements
 
+### 1.6
 - You can now pet Palsonas by clicking on them in the popup!
 - Added Palsonas to Twitch user cards (can be turned off in the options)
 - Fixed a bug where chat messages would not line-break correctly with very large Palsona icons
 
 ### 1.5
-
 - Added upload buttons to channel list in extension popup which redirect to the corresponding maker sites
 - Current channel detected in popout chats and mod view
 - Fixed a bug where the chat would not scroll to the very bottom with large palsona icons
 
 ### 1.0
-
 - Extension working for multiple communities
 
 ## Docs
