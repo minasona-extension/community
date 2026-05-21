@@ -219,16 +219,20 @@ function mountObserver(container: HTMLElement) {
   }
   if (currentChannelName === "") return;
 
-  container.addEventListener("click", (e) => {
-    const icon = (e.target as HTMLElement).closest<HTMLElement>(".palsona-icon");
-    if (!icon || !icon.parentElement) return;
-    e.preventDefault();
-    e.stopPropagation();
-    // use parent element since onclick is always <img /> and not created <picture><source /><img /></picture> with data fields
-    const imageUrl = icon.parentElement.dataset.imageUrl;
-    const fallbackUrl = icon.parentElement.dataset.fallbackUrl;
-    if (imageUrl && fallbackUrl) showMinasonaPopover(icon.parentElement, imageUrl, fallbackUrl);
-  });
+  document.addEventListener(
+    "click",
+    (e) => {
+      const icon = (e.target as HTMLElement).closest<HTMLElement>(".palsona-icon");
+      if (!icon || !icon.parentElement) return;
+      e.preventDefault();
+      e.stopPropagation();
+      // use parent element since onclick is always <img /> and not created <picture><source /><img /></picture> with data fields
+      const imageUrl = icon.parentElement.dataset.imageUrl;
+      const fallbackUrl = icon.parentElement.dataset.fallbackUrl;
+      if (imageUrl && fallbackUrl) showMinasonaPopover(icon.parentElement, imageUrl, fallbackUrl);
+    },
+    { capture: true },
+  );
 
   // create and start observer
   currentObserver = new MutationObserver((mutations) => {
