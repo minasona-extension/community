@@ -46,8 +46,30 @@ function getOrCreatePopover(): HTMLElement {
 
     document.body.append(popoverInstance);
 
+    // Intercept pointer/mouse events at the window level during the CAPTURE
+    // phase so that 7TV's "click-outside" detection never sees them.
+    //
+    // 7TV uses VueUse's `onClickOutside`, which registers a `pointerdown`
+    // listener with `{ capture: true }` on `document`. Capture-phase listeners
+    // fire top-down: window → document → … → target. By intercepting on
+    // `window` (capture) we run *before* 7TV's `document` (capture) handler.
+    // `stopImmediatePropagation` prevents ANY further listeners for this event
+    // on any element in the tree, so 7TV never gets the chance to close the
+    // viewer-card.
+    for (const evt of ["pointerdown", "mousedown"] as const) {
+      window.addEventListener(
+        evt,
+        (e) => {
+          if (popoverInstance?.classList.contains("active") && popoverInstance.contains(e.target as Node)) {
+            e.stopImmediatePropagation();
+          }
+        },
+        { capture: true },
+      );
+    }
+
     // logic to close popover when clicking outside
-    document.addEventListener("click", (e) => {
+    document.addEventListener("mousedown", (e) => {
       if (popoverInstance && popoverInstance.classList.contains("active") && !popoverInstance.contains(e.target as HTMLElement)) {
         popoverInstance.classList.remove("active");
         resetPettingEffect(popoverInstance);
