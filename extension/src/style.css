@@ -19,7 +19,7 @@
   border: 1px solid #303032;
   border-radius: 6px;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-  z-index: 99999;
+  z-index: 99999999;
   cursor: pointer;
 
   /* Flexbox to center the image inside the 250x250 box */
@@ -147,6 +147,7 @@
   width: 100%;
 }
 
-.seventv-user-card {
-  max-height: fit-content !important;
+.seventv-user-card,
+.seventv-usercard {
+  max-height: 524px !important;
 }

@@ -15,6 +15,7 @@ let chatContainerScroller: HTMLElement | null = null;
 let currentObserver: MutationObserver | null = null;
 let currentNativeUsercardObserver: MutationObserver | null = null;
 let currentSevenTvUsercardObserver: MutationObserver | null = null;
+let currentNewSevenTvUsercardObserver: MutationObserver | null = null;
 let currentChannelName: string = "";
 // the user list for the current chat with the current settings
 // this list is used, so we don't have to recalculate which palsona to use each time a user chats
@@ -247,6 +248,7 @@ function mountObserver(container: HTMLElement) {
   if (settingPalsonasInUserCards) {
     startNativeUsercardObserver();
     startSevenTvUsercardObserver();
+    startNewSevenTvUsercardObserver();
   }
 }
 
@@ -316,6 +318,25 @@ function startSevenTvUsercardObserver() {
   currentSevenTvUsercardObserver.observe(popupLayer, { childList: true, subtree: false });
 }
 
+function startNewSevenTvUsercardObserver() {
+  const popupLayer = document.querySelector<HTMLElement>("#seventv-root");
+  if (!popupLayer) return;
+
+  currentNewSevenTvUsercardObserver = new MutationObserver(async () => {
+    await new Promise((res) => setTimeout(res, 100));
+    if (popupLayer.childElementCount == 0) return;
+    if (popupLayer.querySelector<HTMLElement>(".viewer-card-palsona")) return;
+    const usercard = popupLayer.querySelector<HTMLElement>(".seventv-usercard");
+    if (!usercard) return;
+    const nameTag = usercard.querySelector<HTMLElement>(".seventv-usercard-display-name");
+    if (!nameTag) return;
+    const palsonaBanner = createPalsonaBanner(handleUsernameLocalization(nameTag.innerText).toLowerCase());
+    if (!palsonaBanner) return;
+    addPalsonaSectionToViewerCard(usercard, palsonaBanner, "append");
+  });
+  currentNewSevenTvUsercardObserver.observe(popupLayer, { childList: true, subtree: false });
+}
+
 /**
  * Disconnects the current observer from the chat container, if any.
  */
@@ -334,6 +355,10 @@ function disconnectObserver() {
   if (currentSevenTvUsercardObserver) {
     currentSevenTvUsercardObserver.disconnect();
     currentSevenTvUsercardObserver = null;
+  }
+  if (currentNewSevenTvUsercardObserver) {
+    currentNewSevenTvUsercardObserver.disconnect();
+    currentNewSevenTvUsercardObserver = null;
   }
 }
 
@@ -549,9 +574,13 @@ function fixLinebreak(usernameElement: HTMLElement, fixInline: boolean) {
   usernameElement.style.wordBreak = "keep-all";
 }
 
-function addPalsonaSectionToViewerCard(viewerCard: HTMLElement, bannerElement: HTMLElement) {
-  const viewerCardElement = viewerCard.childNodes[0] as HTMLElement;
-  viewerCardElement.insertBefore(bannerElement, viewerCardElement.childNodes[1]);
+function addPalsonaSectionToViewerCard(viewerCard: HTMLElement, bannerElement: HTMLElement, position: "default" | "append" = "default") {
+  if (position === "default") {
+    const viewerCardHeader = viewerCard.childNodes[0] as HTMLElement;
+    viewerCardHeader.insertBefore(bannerElement, viewerCardHeader.childNodes[1]);
+  } else {
+    viewerCard.insertBefore(bannerElement, viewerCard.childNodes[1]);
+  }
 }
 
 function createPalsonaBanner(username: string): HTMLElement | undefined {
