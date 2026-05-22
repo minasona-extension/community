@@ -21,19 +21,22 @@ Community & Project Strategy - Heroilde
 
 ## Out Now!
 
-### Chrome v1.6.2
+### Chrome v1.6.3
 https://chromewebstore.google.com/detail/eiceflbbckfcbmkeinpjkcibaenlmhff
 
-### Edge v1.6.2
+### Edge v1.6.3
 [Download from chrome store](https://chromewebstore.google.com/detail/eiceflbbckfcbmkeinpjkcibaenlmhff)
 
-### Opera v1.6.2
+### Opera v1.6.3
 [Download from chrome store](https://chromewebstore.google.com/detail/eiceflbbckfcbmkeinpjkcibaenlmhff)
 
-### Firefox v1.6.2
+### Firefox v1.6.3
 https://addons.mozilla.org/de/firefox/addon/palsona-twitch-badges/
 
 ## Changelog
+
+#### 1.6.3
+- Support for new 7TV extension
 
 #### 1.6.2
 - Support for users with arabic, chinese or japanese names using the localization feature on Twitch
@@ -51,6 +54,9 @@ https://addons.mozilla.org/de/firefox/addon/palsona-twitch-badges/
 
 ### 1.0
 - Extension working for multiple communities
+
+## Issues
+- [7tv (new)] Palsonas not shown in usercards for users with localized displaynames
 
 ## Docs
 
