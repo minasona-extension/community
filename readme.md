@@ -35,6 +35,9 @@ https://addons.mozilla.org/de/firefox/addon/palsona-twitch-badges/
 
 ## Changelog
 
+#### 1.6.4
+- Fixed: Message history in new 7TV viewercards not scrollable in Firefox
+
 #### 1.6.3
 - Support for new 7TV extension
 
@@ -56,7 +59,9 @@ https://addons.mozilla.org/de/firefox/addon/palsona-twitch-badges/
 - Extension working for multiple communities
 
 ## Issues
-- [7tv (new)] Palsonas not shown in usercards for users with localized displaynames
+- Hovering a username in a shared chat removes the palsona icon
+- [7TV (new)] Palsonas not shown in usercards for Minawan with localized displaynames
+- [7TV (new)] Usercard Palsona Icons are not clickable
 
 ## Docs
 

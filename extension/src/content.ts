@@ -580,6 +580,9 @@ function addPalsonaSectionToViewerCard(viewerCard: HTMLElement, bannerElement: H
     viewerCardHeader.insertBefore(bannerElement, viewerCardHeader.childNodes[1]);
   } else {
     viewerCard.insertBefore(bannerElement, viewerCard.childNodes[1]);
+    const cardBody = viewerCard.querySelector<HTMLElement>(".seventv-usercard-body");
+    if (!cardBody) return;
+    cardBody.style.maxHeight = "180px";
   }
 }
 
