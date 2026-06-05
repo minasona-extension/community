@@ -16,6 +16,7 @@ let currentObserver: MutationObserver | null = null;
 let currentNativeUsercardObserver: MutationObserver | null = null;
 let currentSevenTvUsercardObserver: MutationObserver | null = null;
 let currentNewSevenTvUsercardObserver: MutationObserver | null = null;
+//let currentHoverHandler: ((e: MouseEvent) => void) | null = null;
 let currentChannelName: string = "";
 // the user list for the current chat with the current settings
 // this list is used, so we don't have to recalculate which palsona to use each time a user chats
@@ -220,6 +221,47 @@ function mountObserver(container: HTMLElement) {
   }
   if (currentChannelName === "") return;
 
+  addPopoverListener();
+
+  // create and start observer
+  currentObserver = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.forEach((node) => {
+        processNode(node);
+      });
+    });
+  });
+  currentObserver.observe(container, { childList: true, subtree: false });
+
+  /*
+  // Re-inject icons after 7TV shared-chat hover rewrites the DOM.
+  // A single delegated mouseover listener is more performant than subtree:true
+  // observers or per-element observers — zero overhead when not hovering.
+  currentHoverHandler = async (e: MouseEvent) => {
+    const target = e.target as HTMLElement;
+    const messageNode = target.closest<HTMLElement>(".seventv-chat-message, .chat-line__message");
+    if (!messageNode) return;
+    console.log("got message node");
+
+    // Let 7TV finish its DOM rewrite before checking
+    // works most of the time but not when moving the mouse fast over 7tvs popover, then icon disappears but function is called regardless.
+    // I think this function runs first, detects the container is still there and then 7tv removes it. Maybe add a small delay (10ms)
+    await new Promise((res) => setTimeout(res, 20));
+    if (messageNode.querySelector(".minasona-icon-container")) return;
+    processNode(messageNode);
+  };
+  container.addEventListener("mouseover", currentHoverHandler);
+  container.addEventListener("mouseleave", currentHoverHandler);
+  */
+
+  if (settingPalsonasInUserCards) {
+    startNativeUsercardObserver();
+    startSevenTvUsercardObserver();
+    startNewSevenTvUsercardObserver();
+  }
+}
+
+function addPopoverListener() {
   document.addEventListener(
     "click",
     (e) => {
@@ -234,22 +276,6 @@ function mountObserver(container: HTMLElement) {
     },
     { capture: true },
   );
-
-  // create and start observer
-  currentObserver = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      mutation.addedNodes.forEach((node) => {
-        processNode(node);
-      });
-    });
-  });
-  currentObserver.observe(container, { childList: true, subtree: false });
-
-  if (settingPalsonasInUserCards) {
-    startNativeUsercardObserver();
-    startSevenTvUsercardObserver();
-    startNewSevenTvUsercardObserver();
-  }
 }
 
 /**
@@ -265,6 +291,7 @@ function handlePopoutUsercard(username: string) {
   const palsonaBanner = createPalsonaBanner(username);
   if (!palsonaBanner) return;
   addPalsonaSectionToViewerCard(viewerCard, palsonaBanner);
+  addPopoverListener();
 }
 
 /**
@@ -345,6 +372,10 @@ function disconnectObserver() {
     currentObserver.disconnect();
     currentObserver = null;
   }
+  /*if (currentHoverHandler && currentChatContainer) {
+    currentChatContainer.removeEventListener("mouseover", currentHoverHandler);
+    currentHoverHandler = null;
+  }*/
   currentChatContainer = null;
   chatContainerScroller = null;
 
@@ -462,7 +493,7 @@ function getPalsonaPriorityList(userElement: { [communityName: string]: PalsonaE
  * @param manualHeight Whether to use the user specified height or a manual set height.
  * @returns The icon element.
  */
-function createPalsonaIcon(ps: PalsonaEntry, manualHeight?: string, addOnClickListener?: boolean): HTMLPictureElement {
+function createPalsonaIcon(ps: PalsonaEntry, manualHeight?: string): HTMLPictureElement {
   const source = document.createElement("source");
   source.srcset = ps.iconUrl;
   source.type = "image/avif";
@@ -482,14 +513,6 @@ function createPalsonaIcon(ps: PalsonaEntry, manualHeight?: string, addOnClickLi
   if (ps.imageUrl) {
     icon.dataset.imageUrl = ps.imageUrl;
     icon.dataset.fallbackUrl = ps.fallbackImageUrl;
-    if (addOnClickListener) {
-      icon.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        showMinasonaPopover(e.target as HTMLElement, ps.imageUrl, ps.fallbackImageUrl);
-      });
-    }
   }
 
   return icon;
@@ -599,7 +622,7 @@ function createPalsonaBanner(username: string): HTMLElement | undefined {
   const palsonaContainer = document.createElement("div");
   palsonaContainer.classList.add("viewer-card-palsona-container");
   for (const ps of getPalsonaPriorityList(minasonaMap[username] || {}, false)) {
-    const icon = createPalsonaIcon(ps, "64", true);
+    const icon = createPalsonaIcon(ps, "64");
     icon.style.marginLeft = "2px";
     icon.style.marginRight = "2px";
     palsonaContainer.append(icon);
