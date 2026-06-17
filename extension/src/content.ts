@@ -16,7 +16,6 @@ let currentObserver: MutationObserver | null = null;
 let currentNativeUsercardObserver: MutationObserver | null = null;
 let currentSevenTvUsercardObserver: MutationObserver | null = null;
 let currentNewSevenTvUsercardObserver: MutationObserver | null = null;
-//let currentHoverHandler: ((e: MouseEvent) => void) | null = null;
 let currentChannelName: string = "";
 // the user list for the current chat with the current settings
 // this list is used, so we don't have to recalculate which palsona to use each time a user chats
@@ -226,33 +225,24 @@ function mountObserver(container: HTMLElement) {
   // create and start observer
   currentObserver = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
+      if (mutation.type !== "childList") return;
+
+      const target = mutation.target as HTMLElement;
+      if (target.nodeType !== 1) return;
+
       mutation.addedNodes.forEach((node) => {
-        processNode(node);
+        const eNode = node as HTMLElement;
+        if (
+          (eNode.children && eNode.children[0]?.classList.contains("chat-line__message")) ||
+          (eNode.children && eNode.children[0]?.classList.contains("chat-line__username-container--hoverable")) ||
+          eNode.classList?.contains("chat-line__username-container--hoverable") ||
+          eNode.classList?.contains("seventv-message")
+        )
+          processNode(node);
       });
     });
   });
-  currentObserver.observe(container, { childList: true, subtree: false });
-
-  /*
-  // Re-inject icons after 7TV shared-chat hover rewrites the DOM.
-  // A single delegated mouseover listener is more performant than subtree:true
-  // observers or per-element observers — zero overhead when not hovering.
-  currentHoverHandler = async (e: MouseEvent) => {
-    const target = e.target as HTMLElement;
-    const messageNode = target.closest<HTMLElement>(".seventv-chat-message, .chat-line__message");
-    if (!messageNode) return;
-    console.log("got message node");
-
-    // Let 7TV finish its DOM rewrite before checking
-    // works most of the time but not when moving the mouse fast over 7tvs popover, then icon disappears but function is called regardless.
-    // I think this function runs first, detects the container is still there and then 7tv removes it. Maybe add a small delay (10ms)
-    await new Promise((res) => setTimeout(res, 20));
-    if (messageNode.querySelector(".minasona-icon-container")) return;
-    processNode(messageNode);
-  };
-  container.addEventListener("mouseover", currentHoverHandler);
-  container.addEventListener("mouseleave", currentHoverHandler);
-  */
+  currentObserver.observe(container, { childList: true, subtree: true });
 
   if (settingPalsonasInUserCards) {
     startNativeUsercardObserver();
