@@ -21,7 +21,7 @@ async function main() {
   });
 
   handlePalsonaManager(result.palsonaManagerList || []);
-  handleAmountSlider(parseInt(result.palsonaLimit || "2"));
+  handleAmountSlider(parseInt(result.palsonaLimit || "3"));
   handleSizeSlider(parseInt(result.iconSize || "32"));
   updateTwitchPreview();
 
