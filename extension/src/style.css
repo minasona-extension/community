@@ -147,7 +147,16 @@
   width: 100%;
 }
 
-.seventv-user-card,
-.seventv-usercard {
-  max-height: 524px !important;
+/* New 7TV */
+.seventv-usercard.ps-container {
+  max-height: 522px !important;
+}
+
+.seventv-usercard.ps-container > .seventv-usercard-body {
+  max-height: 150px;
+}
+
+/* Old 7TV */
+.seventv-user-card.ps-container {
+  max-height: 582px !important;
 }

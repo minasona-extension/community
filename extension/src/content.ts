@@ -340,6 +340,7 @@ function startSevenTvUsercardObserver() {
       const palsonaBanner = createPalsonaBanner(handleUsernameLocalization(nameTag.innerText).toLowerCase());
       if (!palsonaBanner) continue;
       addPalsonaSectionToViewerCard(seventvViewerCard, palsonaBanner);
+      seventvViewerCard.classList.add("ps-container");
     }
   });
   currentSevenTvUsercardObserver.observe(popupLayer, { childList: true, subtree: false });
@@ -360,6 +361,7 @@ function startNewSevenTvUsercardObserver() {
     const palsonaBanner = createPalsonaBanner(handleUsernameLocalization(nameTag.innerText).toLowerCase());
     if (!palsonaBanner) return;
     addPalsonaSectionToViewerCard(usercard, palsonaBanner, "append");
+    usercard.classList.add("ps-container");
   });
   currentNewSevenTvUsercardObserver.observe(popupLayer, { childList: true, subtree: false });
 }
@@ -603,9 +605,6 @@ function addPalsonaSectionToViewerCard(viewerCard: HTMLElement, bannerElement: H
     viewerCardHeader.insertBefore(bannerElement, viewerCardHeader.childNodes[1]);
   } else {
     viewerCard.insertBefore(bannerElement, viewerCard.childNodes[1]);
-    const cardBody = viewerCard.querySelector<HTMLElement>(".seventv-usercard-body");
-    if (!cardBody) return;
-    cardBody.style.maxHeight = "180px";
   }
 }
 
