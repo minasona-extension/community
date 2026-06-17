@@ -236,7 +236,9 @@ function mountObserver(container: HTMLElement) {
           (eNode.children && eNode.children[0]?.classList.contains("chat-line__message")) ||
           (eNode.children && eNode.children[0]?.classList.contains("chat-line__username-container--hoverable")) ||
           eNode.classList?.contains("chat-line__username-container--hoverable") ||
-          eNode.classList?.contains("seventv-message")
+          eNode.classList?.contains("seventv-message") ||
+          (eNode.children && eNode.children[0]?.classList.contains("vod-message")) ||
+          eNode.classList?.contains("seventv-chat-vod-message-patched")
         )
           processNode(node);
       });
@@ -364,10 +366,6 @@ function disconnectObserver() {
     currentObserver.disconnect();
     currentObserver = null;
   }
-  /*if (currentHoverHandler && currentChatContainer) {
-    currentChatContainer.removeEventListener("mouseover", currentHoverHandler);
-    currentHoverHandler = null;
-  }*/
   currentChatContainer = null;
   chatContainerScroller = null;
 
