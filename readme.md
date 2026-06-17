@@ -37,7 +37,7 @@ https://addons.mozilla.org/de/firefox/addon/palsona-twitch-badges/
 
 #### 1.6.5
 - Fixed: Chatlog spilling over viewercard for users with many badges
-- Fixed: Hovering over usernames in shared chats removes the Palsona icon
+- Fixed: Hovering over usernames in shared chats removes the Palsona icons
 
 #### 1.6.4
 - Fixed: Message history in new 7TV viewercards not scrollable in Firefox
