@@ -21,16 +21,16 @@ Community & Project Strategy - Heroilde
 
 ## Out Now!
 
-### Chrome v1.6.3
+### Chrome v1.6.6
 https://chromewebstore.google.com/detail/eiceflbbckfcbmkeinpjkcibaenlmhff
 
-### Edge v1.6.3
+### Edge v1.6.6
 [Download from chrome store](https://chromewebstore.google.com/detail/eiceflbbckfcbmkeinpjkcibaenlmhff)
 
-### Opera v1.6.3
+### Opera v1.6.6
 [Download from chrome store](https://chromewebstore.google.com/detail/eiceflbbckfcbmkeinpjkcibaenlmhff)
 
-### Firefox v1.6.4
+### Firefox v1.6.6
 https://addons.mozilla.org/de/firefox/addon/palsona-twitch-badges/
 
 ## Changelog
