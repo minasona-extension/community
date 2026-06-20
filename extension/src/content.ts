@@ -231,16 +231,7 @@ function mountObserver(container: HTMLElement) {
       if (target.nodeType !== 1) return;
 
       mutation.addedNodes.forEach((node) => {
-        const eNode = node as HTMLElement;
-        if (
-          (eNode.children && eNode.children[0]?.classList.contains("chat-line__message")) ||
-          (eNode.children && eNode.children[0]?.classList.contains("chat-line__username-container--hoverable")) ||
-          eNode.classList?.contains("chat-line__username-container--hoverable") ||
-          eNode.classList?.contains("seventv-message") ||
-          (eNode.children && eNode.children[0]?.classList.contains("vod-message")) ||
-          eNode.classList?.contains("seventv-chat-vod-message-patched")
-        )
-          processNode(node);
+        processNode(node);
       });
     });
   });
@@ -411,6 +402,7 @@ function handleUsernameLocalization(username: string): string {
  */
 function processNode(node: Node) {
   if (!(node instanceof HTMLElement)) return;
+  if (node.querySelector(".palsona-icon")) return;
 
   // get username
   const usernameElement = getUsernameElement(node);
