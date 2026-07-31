@@ -21,19 +21,22 @@ Community & Project Strategy - Heroilde
 
 ## Out Now!
 
-### Chrome v1.6.6
+### Chrome v1.6.7
 https://chromewebstore.google.com/detail/eiceflbbckfcbmkeinpjkcibaenlmhff
 
-### Edge v1.6.6
+### Edge v1.6.7
 [Download from chrome store](https://chromewebstore.google.com/detail/eiceflbbckfcbmkeinpjkcibaenlmhff)
 
-### Opera v1.6.6
+### Opera v1.6.7
 [Download from chrome store](https://chromewebstore.google.com/detail/eiceflbbckfcbmkeinpjkcibaenlmhff)
 
-### Firefox v1.6.6
+### Firefox v1.6.7
 https://addons.mozilla.org/de/firefox/addon/palsona-twitch-badges/
 
 ## Changelog
+
+#### 1.6.8
+- Fixed: Palsonas from inactive communities no longer appear
 
 #### 1.6.7
 - Fixed: Icons not showing up in chat sometimes
