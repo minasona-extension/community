@@ -50,7 +50,7 @@ function disableSettingsPage() {
  * @returns
  */
 function createCurrentManagerList(managerList: managerEntry[]): managerEntry[] {
-  if (!managerList) {
+  if (!managerList || managerList.length === 0) {
     return [
       { dataId: "current-channel", enabled: true },
       ...Object.keys(communityMap).map((community) => {
