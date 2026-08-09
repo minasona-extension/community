@@ -21,19 +21,22 @@ Community & Project Strategy - Heroilde
 
 ## Out Now!
 
-### Chrome v1.6.7
+### Chrome v1.6.8
 https://chromewebstore.google.com/detail/eiceflbbckfcbmkeinpjkcibaenlmhff
 
-### Edge v1.6.7
+### Edge v1.6.8
 [Download from chrome store](https://chromewebstore.google.com/detail/eiceflbbckfcbmkeinpjkcibaenlmhff)
 
-### Opera v1.6.7
+### Opera v1.6.8
 [Download from chrome store](https://chromewebstore.google.com/detail/eiceflbbckfcbmkeinpjkcibaenlmhff)
 
-### Firefox v1.6.7
+### Firefox v1.6.8
 https://addons.mozilla.org/de/firefox/addon/palsona-twitch-badges/
 
 ## Changelog
+
+#### 1.6.9
+- Fixed: Palsona manager list not reflecting actual settings when new communities are added.
 
 #### 1.6.8
 - Fixed: Palsonas from inactive communities no longer appear
