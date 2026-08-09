@@ -1,5 +1,5 @@
 import browser from "webextension-polyfill";
-import { communityData, MinasonaStorage } from "./types";
+import { communityData, managerEntry, MinasonaStorage } from "./types";
 import { UPDATE_INTERVAL } from "./config";
 
 /**
@@ -50,11 +50,52 @@ async function updateMinasonaMap() {
       });
     });
 
-    browser.storage.local.set({ minasonaMap: reducedData, lastUpdate: new Date().getTime(), communities: communityData.channels });
+    await browser.storage.local.set({ minasonaMap: reducedData, lastUpdate: new Date().getTime(), communities: communityData.channels });
     console.log(`${new Date().toLocaleTimeString()} Minasona map updated.`);
+
+    const finalManagerList = await createCurrentManagerList(communityData.channels);
+    await browser.storage.sync.set({ palsonaManagerList: finalManagerList });
+    console.log(`${new Date().toLocaleTimeString()} Palsona manager updated.`);
   } catch (error) {
     console.error(`${new Date().toLocaleTimeString()} Failed to fetch minasonas: `, error);
   }
+}
+
+/**
+ * Check the managerList and remove any items where the dataId is not present in the communities array.
+ * Then append any community which is not in the managerList to the end and enable them.
+ * @param communities A list of all enabled communities.
+ * @returns
+ */
+async function createCurrentManagerList(communities: Record<string, communityData>): Promise<managerEntry[]> {
+  const result: { palsonaManagerList?: managerEntry[] } = await browser.storage.sync.get(["palsonaManagerList"]);
+  let pml = result.palsonaManagerList;
+
+  // handle if manager list is undefined or empty
+  if (!pml || pml.length === 0) {
+    return [
+      { dataId: "current-channel", enabled: true },
+      ...Object.keys(communities).map((community) => {
+        return { dataId: community, enabled: true };
+      }),
+    ];
+  }
+
+  // handle if current-channel is missing for some reason
+  if (!pml.find((v) => v.dataId === "current-channel")) {
+    pml = [{ dataId: "current-channel", enabled: true }, ...pml];
+  }
+
+  // remove items that are no longer in communities
+  const cleanedManagerList = pml.filter((entry) => entry.dataId === "current-channel" || Object.keys(communities).includes(entry.dataId));
+
+  // find communities that aren't in the manager list
+  const existingCommunities = pml.map((entry) => entry.dataId);
+  const newEntries: managerEntry[] = Object.keys(communities)
+    .filter((com) => !existingCommunities.includes(com))
+    .map((com) => ({ dataId: com, enabled: true }));
+
+  return [...cleanedManagerList, ...newEntries];
 }
 
 /**

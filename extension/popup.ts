@@ -42,41 +42,10 @@ function disableSettingsPage() {
   disableScreen.style.display = "flex";
 }
 
-/**
- * Check the managerList and remove any items where the dataId is not present in the communities array.
- * Then append any community which is not in the managerList to the end and enable them.
- * @param managerList
- * @param communities
- * @returns
- */
-function createCurrentManagerList(managerList: managerEntry[]): managerEntry[] {
-  if (!managerList || managerList.length === 0) {
-    return [
-      { dataId: "current-channel", enabled: true },
-      ...Object.keys(communityMap).map((community) => {
-        return { dataId: community, enabled: true };
-      }),
-    ];
-  }
-
-  // remove items that are no longer in communities
-  const cleanedManagerList = managerList.filter((entry) => entry.dataId === "current-channel" || Object.keys(communityMap).includes(entry.dataId));
-
-  // find communities that aren't in the managerlist
-  const existingCommunities = managerList.map((entry) => entry.dataId);
-  const newEntries: managerEntry[] = Object.keys(communityMap)
-    .filter((com) => !existingCommunities.includes(com))
-    .map((com) => ({ dataId: com, enabled: true }));
-
-  return [...cleanedManagerList, ...newEntries];
-}
-
 function handlePalsonaManager(managerList: managerEntry[]) {
-  const cleanedManagerList = createCurrentManagerList(managerList);
-
   // init state
   const managerElement = document.getElementById("palsona-manager") as HTMLDivElement;
-  for (const entry of cleanedManagerList) {
+  for (const entry of managerList) {
     // create channel item here
     const currentChannelItem = document.createElement("div");
     currentChannelItem.classList.add("draggable-item");
