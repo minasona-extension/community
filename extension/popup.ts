@@ -54,7 +54,6 @@ function handlePalsonaManager(managerList: managerEntry[]) {
 
     const label = document.createElement("label");
     label.classList.add("option-label");
-    label.title = "Palsona for the currently watched channel";
     currentChannelItem.append(label);
 
     const dragImg = document.createElement("img");
@@ -73,6 +72,8 @@ function handlePalsonaManager(managerList: managerEntry[]) {
     span.innerText = communityMap[entry.dataId]?.namePlural || (entry.dataId === "current-channel" ? "Current Channel Palsonas" : entry.dataId);
     if (entry.dataId !== "current-channel") {
       span.title = `${entry.dataId.charAt(0).toUpperCase()}${entry.dataId.slice(1)}'s Community`;
+    } else {
+      span.title = "Palsona for the currently watched channel";
     }
     label.append(span);
 
