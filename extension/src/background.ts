@@ -113,9 +113,18 @@ function getAllowedUrl(url: string | undefined): string {
 }
 
 // Update data on install and set up alarm
-browser.runtime.onInstalled.addListener(async () => {
-  updateMinasonaMap();
+browser.runtime.onInstalled.addListener(async (details) => {
+  await updateMinasonaMap();
   setupAlarm();
+
+  // open options page once after install
+  if (details.reason === "install") {
+    try {
+      await browser.action.openPopup();
+    } catch (error) {
+      console.error("Failed to open the settings popup:", error);
+    }
+  }
 });
 
 // Update data on browser startup and set up alarm
