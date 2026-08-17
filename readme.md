@@ -35,8 +35,12 @@ https://addons.mozilla.org/de/firefox/addon/palsona-twitch-badges/
 
 ## Changelog
 
+#### 1.6.11
+- Settings page opens once on install
+- Added small explanation to settings page
+
 #### 1.6.9
-- Fixed: Palsona manager list not reflecting actual settings when new communities are added.
+- Fixed: Palsona manager list not reflecting actual settings when new communities are added
 
 #### 1.6.8
 - Fixed: Palsonas from inactive communities no longer appear
